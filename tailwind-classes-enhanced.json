@@ -1,0 +1,132 @@
+{
+  "classNamesTree": {
+    "p": {
+      "0": { "__info": { "type": "utility", "description": "Padding 0", "category": "spacing" } },
+      "1": { "__info": { "type": "utility", "description": "Padding 0.25rem (4px)", "category": "spacing" } },
+      "2": { "__info": { "type": "utility", "description": "Padding 0.5rem (8px)", "category": "spacing" } },
+      "3": { "__info": { "type": "utility", "description": "Padding 0.75rem (12px)", "category": "spacing" } },
+      "4": { "__info": { "type": "utility", "description": "Padding 1rem (16px)", "category": "spacing" } },
+      "5": { "__info": { "type": "utility", "description": "Padding 1.25rem (20px)", "category": "spacing" } },
+      "6": { "__info": { "type": "utility", "description": "Padding 1.5rem (24px)", "category": "spacing" } },
+      "8": { "__info": { "type": "utility", "description": "Padding 2rem (32px)", "category": "spacing" } },
+      "10": { "__info": { "type": "utility", "description": "Padding 2.5rem (40px)", "category": "spacing" } },
+      "12": { "__info": { "type": "utility", "description": "Padding 3rem (48px)", "category": "spacing" } }
+    },
+    "m": {
+      "0": { "__info": { "type": "utility", "description": "Margin 0", "category": "spacing" } },
+      "1": { "__info": { "type": "utility", "description": "Margin 0.25rem (4px)", "category": "spacing" } },
+      "2": { "__info": { "type": "utility", "description": "Margin 0.5rem (8px)", "category": "spacing" } },
+      "3": { "__info": { "type": "utility", "description": "Margin 0.75rem (12px)", "category": "spacing" } },
+      "4": { "__info": { "type": "utility", "description": "Margin 1rem (16px)", "category": "spacing" } },
+      "5": { "__info": { "type": "utility", "description": "Margin 1.25rem (20px)", "category": "spacing" } },
+      "6": { "__info": { "type": "utility", "description": "Margin 1.5rem (24px)", "category": "spacing" } },
+      "8": { "__info": { "type": "utility", "description": "Margin 2rem (32px)", "category": "spacing" } },
+      "10": { "__info": { "type": "utility", "description": "Margin 2.5rem (40px)", "category": "spacing" } },
+      "12": { "__info": { "type": "utility", "description": "Margin 3rem (48px)", "category": "spacing" } }
+    },
+    "bg": {
+      "red": {
+        "50": { "__info": { "type": "utility", "description": "Red 50 background", "category": "colors" } },
+        "100": { "__info": { "type": "utility", "description": "Red 100 background", "category": "colors" } },
+        "200": { "__info": { "type": "utility", "description": "Red 200 background", "category": "colors" } },
+        "300": { "__info": { "type": "utility", "description": "Red 300 background", "category": "colors" } },
+        "400": { "__info": { "type": "utility", "description": "Red 400 background", "category": "colors" } },
+        "500": { "__info": { "type": "utility", "description": "Red 500 background", "category": "colors" } },
+        "600": { "__info": { "type": "utility", "description": "Red 600 background", "category": "colors" } },
+        "700": { "__info": { "type": "utility", "description": "Red 700 background", "category": "colors" } },
+        "800": { "__info": { "type": "utility", "description": "Red 800 background", "category": "colors" } },
+        "900": { "__info": { "type": "utility", "description": "Red 900 background", "category": "colors" } }
+      },
+      "blue": {
+        "50": { "__info": { "type": "utility", "description": "Blue 50 background", "category": "colors" } },
+        "100": { "__info": { "type": "utility", "description": "Blue 100 background", "category": "colors" } },
+        "200": { "__info": { "type": "utility", "description": "Blue 200 background", "category": "colors" } },
+        "300": { "__info": { "type": "utility", "description": "Blue 300 background", "category": "colors" } },
+        "400": { "__info": { "type": "utility", "description": "Blue 400 background", "category": "colors" } },
+        "500": { "__info": { "type": "utility", "description": "Blue 500 background", "category": "colors" } },
+        "600": { "__info": { "type": "utility", "description": "Blue 600 background", "category": "colors" } },
+        "700": { "__info": { "type": "utility", "description": "Blue 700 background", "category": "colors" } },
+        "800": { "__info": { "type": "utility", "description": "Blue 800 background", "category": "colors" } },
+        "900": { "__info": { "type": "utility", "description": "Blue 900 background", "category": "colors" } }
+      },
+      "green": {
+        "50": { "__info": { "type": "utility", "description": "Green 50 background", "category": "colors" } },
+        "100": { "__info": { "type": "utility", "description": "Green 100 background", "category": "colors" } },
+        "200": { "__info": { "type": "utility", "description": "Green 200 background", "category": "colors" } },
+        "300": { "__info": { "type": "utility", "description": "Green 300 background", "category": "colors" } },
+        "400": { "__info": { "type": "utility", "description": "Green 400 background", "category": "colors" } },
+        "500": { "__info": { "type": "utility", "description": "Green 500 background", "category": "colors" } },
+        "600": { "__info": { "type": "utility", "description": "Green 600 background", "category": "colors" } },
+        "700": { "__info": { "type": "utility", "description": "Green 700 background", "category": "colors" } },
+        "800": { "__info": { "type": "utility", "description": "Green 800 background", "category": "colors" } },
+        "900": { "__info": { "type": "utility", "description": "Green 900 background", "category": "colors" } }
+      },
+      "white": { "__info": { "type": "utility", "description": "White background", "category": "colors" } },
+      "black": { "__info": { "type": "utility", "description": "Black background", "category": "colors" } },
+      "gray": {
+        "50": { "__info": { "type": "utility", "description": "Gray 50 background", "category": "colors" } },
+        "100": { "__info": { "type": "utility", "description": "Gray 100 background", "category": "colors" } },
+        "200": { "__info": { "type": "utility", "description": "Gray 200 background", "category": "colors" } },
+        "300": { "__info": { "type": "utility", "description": "Gray 300 background", "category": "colors" } },
+        "400": { "__info": { "type": "utility", "description": "Gray 400 background", "category": "colors" } },
+        "500": { "__info": { "type": "utility", "description": "Gray 500 background", "category": "colors" } },
+        "600": { "__info": { "type": "utility", "description": "Gray 600 background", "category": "colors" } },
+        "700": { "__info": { "type": "utility", "description": "Gray 700 background", "category": "colors" } },
+        "800": { "__info": { "type": "utility", "description": "Gray 800 background", "category": "colors" } },
+        "900": { "__info": { "type": "utility", "description": "Gray 900 background", "category": "colors" } }
+      }
+    },
+    "text": {
+      "white": { "__info": { "type": "utility", "description": "White text color", "category": "colors" } },
+      "black": { "__info": { "type": "utility", "description": "Black text color", "category": "colors" } },
+      "red": {
+        "500": { "__info": { "type": "utility", "description": "Red 500 text", "category": "colors" } },
+        "600": { "__info": { "type": "utility", "description": "Red 600 text", "category": "colors" } }
+      },
+      "blue": {
+        "500": { "__info": { "type": "utility", "description": "Blue 500 text", "category": "colors" } },
+        "600": { "__info": { "type": "utility", "description": "Blue 600 text", "category": "colors" } }
+      },
+      "gray": {
+        "500": { "__info": { "type": "utility", "description": "Gray 500 text", "category": "colors" } },
+        "600": { "__info": { "type": "utility", "description": "Gray 600 text", "category": "colors" } },
+        "700": { "__info": { "type": "utility", "description": "Gray 700 text", "category": "colors" } },
+        "800": { "__info": { "type": "utility", "description": "Gray 800 text", "category": "colors" } },
+        "900": { "__info": { "type": "utility", "description": "Gray 900 text", "category": "colors" } }
+      }
+    },
+    "rounded": {
+      "__info": { "type": "utility", "description": "Border radius 0.25rem", "category": "borders" },
+      "none": { "__info": { "type": "utility", "description": "No border radius", "category": "borders" } },
+      "sm": { "__info": { "type": "utility", "description": "Small border radius", "category": "borders" } },
+      "md": { "__info": { "type": "utility", "description": "Medium border radius", "category": "borders" } },
+      "lg": { "__info": { "type": "utility", "description": "Large border radius", "category": "borders" } },
+      "xl": { "__info": { "type": "utility", "description": "Extra large border radius", "category": "borders" } },
+      "2xl": { "__info": { "type": "utility", "description": "2x large border radius", "category": "borders" } },
+      "full": { "__info": { "type": "utility", "description": "Full border radius", "category": "borders" } }
+    },
+    "shadow": {
+      "__info": { "type": "utility", "description": "Box shadow", "category": "effects" },
+      "sm": { "__info": { "type": "utility", "description": "Small shadow", "category": "effects" } },
+      "md": { "__info": { "type": "utility", "description": "Medium shadow", "category": "effects" } },
+      "lg": { "__info": { "type": "utility", "description": "Large shadow", "category": "effects" } },
+      "xl": { "__info": { "type": "utility", "description": "Extra large shadow", "category": "effects" } },
+      "2xl": { "__info": { "type": "utility", "description": "2x large shadow", "category": "effects" } },
+      "none": { "__info": { "type": "utility", "description": "No shadow", "category": "effects" } }
+    },
+    "flex": { "__info": { "type": "utility", "description": "Display flex", "category": "layout" } },
+    "block": { "__info": { "type": "utility", "description": "Display block", "category": "layout" } },
+    "inline": { "__info": { "type": "utility", "description": "Display inline", "category": "layout" } },
+    "hidden": { "__info": { "type": "utility", "description": "Display none", "category": "layout" } },
+    "font": {
+      "thin": { "__info": { "type": "utility", "description": "Font weight 100", "category": "typography" } },
+      "light": { "__info": { "type": "utility", "description": "Font weight 300", "category": "typography" } },
+      "normal": { "__info": { "type": "utility", "description": "Font weight 400", "category": "typography" } },
+      "medium": { "__info": { "type": "utility", "description": "Font weight 500", "category": "typography" } },
+      "semibold": { "__info": { "type": "utility", "description": "Font weight 600", "category": "typography" } },
+      "bold": { "__info": { "type": "utility", "description": "Font weight 700", "category": "typography" } },
+      "extrabold": { "__info": { "type": "utility", "description": "Font weight 800", "category": "typography" } },
+      "black": { "__info": { "type": "utility", "description": "Font weight 900", "category": "typography" } }
+    }
+  }
+}

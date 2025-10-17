@@ -1,10 +1,18 @@
 // Content script for Tailwind CSS Developer Tools extension
+(function() {
+  'use strict';
 
-// Global variables
-let highlighter;
-let panel;
-let selectedElement = null;
-let isInspecting = false;
+  // Prevent multiple initialization
+  if (window.tailwindDevToolsInitialized) {
+    return;
+  }
+  window.tailwindDevToolsInitialized = true;
+
+  // Extension variables (scoped to this IIFE)
+  let highlighter;
+  let panel;
+  let selectedElement = null;
+  let isInspecting = false;
 
 // Simple animation implementation without GSAP
 function animateElement(element, properties, duration = 300) {
@@ -44,13 +52,324 @@ function animateElement(element, properties, duration = 300) {
 // Create element highlighter
 function createHighlighter() {
   const highlighterElement = document.createElement('div');
-  highlighterElement.className = 'element-highlighter';
-  highlighterElement.style.display = 'none';
+  highlighterElement.className = 'tailwind-dev-tools-highlighter';
+  highlighterElement.style.cssText = `
+    position: absolute;
+    pointer-events: none;
+    background-color: rgba(59, 130, 246, 0.2);
+    border: 2px solid #3B82F6;
+    border-radius: 4px;
+    z-index: 99998;
+    display: none;
+    transition: all 0.1s ease;
+  `;
   document.body.appendChild(highlighterElement);
   return highlighterElement;
 }
 
-// Create floating panel for extension
+// Enhanced search functionality with intelligent suggestions
+function setupSearchSuggestions() {
+  // Use a more robust approach to find the search input
+  function getSearchInput() {
+    return document.getElementById('class-search') ||
+           document.querySelector('#tailwind-tools-panel #class-search') ||
+           panel.querySelector('#class-search');
+  }
+
+  function getSearchContainer() {
+    const searchInput = getSearchInput();
+    if (searchInput) {
+      return searchInput.parentElement;
+    }
+    return null;
+  }
+
+  // Try to set up search suggestions immediately
+  let searchInput = getSearchInput();
+  let searchContainer = getSearchContainer();
+
+  if (!searchInput || !searchContainer) {
+    // If search elements aren't ready yet, wait and try again
+    let attempts = 0;
+    const maxAttempts = 20; // Try for 2 seconds
+
+    const interval = setInterval(() => {
+      attempts++;
+      searchInput = getSearchInput();
+      searchContainer = getSearchContainer();
+
+      if (searchInput && searchContainer) {
+        clearInterval(interval);
+        setupSearchFunctionality(searchInput, searchContainer);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        console.log('Search suggestions setup failed - elements not found');
+      }
+    }, 100);
+  } else {
+    setupSearchFunctionality(searchInput, searchContainer);
+  }
+
+  function setupSearchFunctionality(searchInput, searchContainer) {
+    const searchSuggestions = document.createElement('div');
+    searchSuggestions.className = 'search-suggestions';
+    searchSuggestions.style.position = 'absolute';
+    searchSuggestions.style.top = '100%';
+    searchSuggestions.style.left = '0';
+    searchSuggestions.style.right = '0';
+    searchSuggestions.style.backgroundColor = 'white';
+    searchSuggestions.style.borderRadius = '8px';
+    searchSuggestions.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.07)';
+    searchSuggestions.style.marginTop = '4px';
+    searchSuggestions.style.zIndex = '1000';
+    searchSuggestions.style.display = 'none';
+    searchSuggestions.style.maxHeight = '300px';
+    searchSuggestions.style.overflowY = 'auto';
+    searchSuggestions.style.border = '1px solid #e5e7eb';
+
+    // Add to search container
+    searchContainer.appendChild(searchSuggestions);
+
+    // Load Tailwind classes
+    let tailwindClasses = [];
+
+    // Load the classes from our enhanced JSON file
+    fetch(chrome.runtime.getURL('tailwind-classes-enhanced.json'))
+      .then(response => response.json())
+      .then(data => {
+        // Flatten the trie-based class structure into a searchable array
+        tailwindClasses = [];
+        const flattenClasses = (obj, prefix = '') => {
+          for (const [key, value] of Object.entries(obj)) {
+            if (key === '__info') {
+              // This is a class info object
+              if (value.type === 'utility' || !value.type) {
+                tailwindClasses.push({
+                  class: prefix,
+                  description: value.description,
+                  category: value.category
+                });
+              }
+            } else if (typeof value === 'object') {
+              // This is a nested object, recurse
+              const newPrefix = prefix ? `${prefix}-${key}` : key;
+              flattenClasses(value, newPrefix);
+            }
+          }
+        };
+
+        // Start flattening from the classNamesTree
+        flattenClasses(data.classNamesTree);
+      })
+      .catch(err => {
+        console.log('Using fallback classes');
+        // Fallback classes if JSON file not available
+        tailwindClasses = [
+          { class: 'p-4', description: 'Padding 1rem (16px)', category: 'spacing' },
+          { class: 'p-6', description: 'Padding 1.5rem (24px)', category: 'spacing' },
+          { class: 'm-4', description: 'Margin 1rem (16px)', category: 'spacing' },
+          { class: 'bg-blue-500', description: 'Blue 500 background', category: 'colors' },
+          { class: 'text-white', description: 'White text color', category: 'colors' },
+          { class: 'rounded-lg', description: 'Border radius 0.5rem', category: 'borders' },
+          { class: 'shadow-md', description: 'Medium shadow', category: 'effects' },
+          { class: 'font-semibold', description: 'Font weight 600', category: 'typography' },
+          { class: 'flex', description: 'Display flex', category: 'layout' }
+        ];
+      });
+
+    // Enhanced search functions for trie-based algorithms
+    function searchWithVariants(query) {
+      const results = [];
+      const queryLower = query.toLowerCase();
+
+      // Search for base classes
+      tailwindClasses.forEach(cls => {
+        if (cls.class.toLowerCase().includes(queryLower) ||
+            cls.description.toLowerCase().includes(queryLower) ||
+            cls.category.toLowerCase().includes(queryLower)) {
+          results.push({
+            class: cls.class,
+            description: cls.description,
+            category: cls.category,
+            variant: null,
+            score: calculateMatchScore(cls, queryLower)
+          });
+        }
+      });
+
+      // Add variant suggestions if query matches a base class
+      if (query && !query.includes(':')) {
+        const baseClassMatch = tailwindClasses.find(cls =>
+          cls.class.toLowerCase() === queryLower ||
+          cls.class.toLowerCase().replace(/-\d+$/, '') === queryLower.replace(/-\d+$/, '')
+        );
+
+        if (baseClassMatch) {
+          // Add responsive variants
+          ['sm', 'md', 'lg', 'xl', '2xl'].forEach(variant => {
+            results.push({
+              class: `${variant}:${baseClassMatch.class}`,
+              description: `Responsive variant: ${baseClassMatch.description}`,
+              category: baseClassMatch.category,
+              variant: `${variant}:`,
+              score: baseClassMatch.class.toLowerCase() === queryLower ? 100 : 80
+            });
+          });
+
+          // Add state variants
+          ['hover', 'focus', 'active', 'visited', 'disabled'].forEach(variant => {
+            results.push({
+              class: `${variant}:${baseClassMatch.class}`,
+              description: `State variant: ${baseClassMatch.description}`,
+              category: baseClassMatch.category,
+              variant: `${variant}:`,
+              score: baseClassMatch.class.toLowerCase() === queryLower ? 95 : 75
+            });
+          });
+        }
+      }
+
+      // Sort by score
+      return results.sort((a, b) => b.score - a.score);
+    }
+
+    function calculateMatchScore(cls, queryLower) {
+      let score = 0;
+
+      // Exact class match
+      if (cls.class.toLowerCase() === queryLower) score += 100;
+
+      // Class starts with query
+      if (cls.class.toLowerCase().startsWith(queryLower)) score += 90;
+
+      // Class contains query
+      if (cls.class.toLowerCase().includes(queryLower)) score += 80;
+
+      // Description match
+      if (cls.description.toLowerCase().includes(queryLower)) score += 50;
+
+      // Category match
+      if (cls.category.toLowerCase().includes(queryLower)) score += 30;
+
+      return score;
+    }
+
+    function generateContextualSuggestions(query, baseResults) {
+      const contextualSuggestions = [...baseResults];
+
+      // If query is short or generic, add popular classes
+      if (query.length < 3 || ['bg', 'text', 'p', 'm', 'rounded', 'shadow'].some(prefix => query.toLowerCase().includes(prefix))) {
+        const popularClasses = [
+          { class: 'p-4', description: 'Padding 1rem (16px)', category: 'spacing', score: 20 },
+          { class: 'p-6', description: 'Padding 1.5rem (24px)', category: 'spacing', score: 20 },
+          { class: 'm-4', description: 'Margin 1rem (16px)', category: 'spacing', score: 20 },
+          { class: 'bg-blue-500', description: 'Blue 500 background', category: 'colors', score: 20 },
+          { class: 'text-white', description: 'White text color', category: 'colors', score: 20 },
+          { class: 'rounded-lg', description: 'Border radius 0.5rem', category: 'borders', score: 20 },
+          { class: 'shadow-md', description: 'Medium shadow', category: 'effects', score: 20 },
+          { class: 'font-semibold', description: 'Font weight 600', category: 'typography', score: 20 }
+        ];
+
+        popularClasses.forEach(cls => {
+          if (!contextualSuggestions.some(s => s.class === cls.class)) {
+            contextualSuggestions.push(cls);
+          }
+        });
+      }
+
+      return contextualSuggestions.filter(cls => cls.score > 0);
+    }
+
+    function performSearch(query) {
+      if (query === '') {
+        searchSuggestions.style.display = 'none';
+        return;
+      }
+
+      // Use requestAnimationFrame for smoother performance
+      requestAnimationFrame(() => {
+        // Enhanced search with variant and context-aware suggestions
+        const filteredClasses = searchWithVariants(query);
+        const searchSuggestionResults = generateContextualSuggestions(query, filteredClasses);
+
+        if (searchSuggestionResults.length > 0) {
+          searchSuggestions.innerHTML = searchSuggestionResults.slice(0, 15).map(cls => {
+            const highlightedClass = cls.class.replace(
+              new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+              match => `<span style="font-weight: 600; color: #3B82F6;">${match}</span>`
+            );
+            const highlightedDescription = cls.description.replace(
+              new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+              match => `<span style="font-weight: 600; color: #3B82F6;">${match}</span>`
+            );
+            return `
+              <div class="search-suggestion" data-class="${cls.class}" style="padding: 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: all 0.1s ease; background: white;">
+                <div style="font-weight: 500; margin-bottom: 4px; font-family: monospace;">${highlightedClass}</div>
+                <div style="font-size: 12px; color: #6B7280;">${highlightedDescription} • ${cls.category}</div>
+                ${cls.variant ? `<div style="font-size: 11px; color: #3B82F6; margin-top: 2px;">${cls.variant}</div>` : ''}
+              </div>
+            `;
+          }).join('');
+          searchSuggestions.style.display = 'block';
+
+          // Add click handlers with better performance
+          const suggestionElements = document.querySelectorAll('.search-suggestion');
+          suggestionElements.forEach(suggestion => {
+            suggestion.addEventListener('click', function () {
+              const selectedClass = this.dataset.class;
+              if (selectedElement && !selectedElement.classList.contains(selectedClass)) {
+                selectedElement.classList.add(selectedClass);
+                const classes = Array.from(selectedElement.classList);
+                displayAppliedClasses(classes);
+                generateSuggestions(classes);
+              }
+              searchInput.value = '';
+              searchSuggestions.style.display = 'none';
+            });
+          });
+        } else {
+          searchSuggestions.innerHTML = `
+            <div style="padding: 12px; color: #6B7280; text-align: center; font-size: 14px;">
+              No classes found. Try a different search term.
+            </div>
+          `;
+          searchSuggestions.style.display = 'block';
+        }
+      });
+    }
+
+    // Search input event listener with optimized debouncing
+    let searchTimeout;
+    searchInput.addEventListener('input', function () {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        performSearch(this.value);
+      }, 10); // Reduced from default to make it nearly instant
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function (e) {
+      if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+        searchSuggestions.style.display = 'none';
+      }
+    });
+
+    // Handle keyboard navigation
+    searchInput.addEventListener('keydown', function (e) {
+      const suggestionElements = document.querySelectorAll('.search-suggestion');
+      if (suggestionElements.length > 0) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          suggestionElements[0].focus();
+        }
+      }
+    });
+
+    console.log('Search suggestions functionality initialized successfully');
+  }
+}
+
+// Create floating panel
 function createFloatingPanel() {
   const panelElement = document.createElement('div');
   panelElement.id = 'tailwind-tools-panel';
@@ -183,7 +502,7 @@ function createFloatingPanel() {
         <div id="applied-classes" style="display: none; margin-bottom: 16px;">
           <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
             <h3 style="font-size: 14px; font-weight: 600; color: #111827; margin: 0;">Applied Classes</h3>
-            <span style="font-size: 11px; color: #6B7280; background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">Click to explore alternatives</span>
+            <span style="font-size: 11px; color: #3B82F6; background: #EFF6FF; padding: 2px 6px; border-radius: 3px; font-weight: 500;">💡 Click any class to explore alternatives</span>
           </div>
           <div id="classes-list" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
         </div>
@@ -274,7 +593,10 @@ function initializeExtension() {
   highlighter = createHighlighter();
   panel = createFloatingPanel();
 
-  // Set up event listeners
+  // Set up enhanced search suggestions after panel is created
+  setupSearchSuggestions();
+
+  // Set up event listeners after panel is created
   setupEventListeners();
 
   // Listen for messages from popup
@@ -312,6 +634,17 @@ function setupEventListeners() {
     closeButton.addEventListener('click', () => {
       panel.style.display = 'none';
       stopInspection();
+    });
+  }
+
+  // Close alternatives modal button
+  const closeAlternativesModalButton = document.getElementById('close-alternatives-modal');
+  if (closeAlternativesModalButton) {
+    closeAlternativesModalButton.addEventListener('click', () => {
+      const modal = document.getElementById('class-alternatives-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
     });
   }
 
@@ -580,6 +913,10 @@ function displayAppliedClasses(classes) {
     removeButton.addEventListener('click', () => {
       removeClass(cls);
     });
+
+    classItem.addEventListener('click', () => {
+      openClassAlternativesModal(cls);
+    });
     
     classItem.appendChild(className);
     classItem.appendChild(removeButton);
@@ -600,7 +937,7 @@ function removeClass(className) {
 // Generate class suggestions
 function generateSuggestions(classes) {
   // This is a simplified version - in a real extension, you would have a more sophisticated algorithm
-  const suggestions = [
+  const classSuggestions = [
     'p-1', 'p-2', 'p-3', 'p-4', 'p-5', 'p-6', 'p-8', 'p-10', 'p-12', 'p-16', 'p-20', 'p-24',
     'm-1', 'm-2', 'm-3', 'm-4', 'm-5', 'm-6', 'm-8', 'm-10', 'm-12', 'm-16', 'm-20', 'm-24',
     'bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500', 
@@ -614,7 +951,7 @@ function generateSuggestions(classes) {
   ];
   
   // Filter out already applied classes
-  const filteredSuggestions = suggestions.filter(suggestion => !classes.includes(suggestion));
+  const filteredSuggestions = classSuggestions.filter(suggestion => !classes.includes(suggestion));
   
   // Display suggestions
   const suggestionsList = document.getElementById('suggestions-list');
@@ -899,10 +1236,418 @@ function scanAccessibility() {
   }
 }
 
-// Initialize when DOM is loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeExtension);
-} else {
-  // DOMContentLoaded already fired
-  initializeExtension();
+// Class Alternatives Explorer functions
+function generateClassAlternatives(className, contextClasses = []) {
+  const alternatives = [];
+
+  // Parse the class to understand its structure
+  const classInfo = parseClassInfo(className);
+  if (!classInfo) return alternatives;
+
+  // Generate alternatives based on class type and context
+  switch (classInfo.type) {
+    case 'spacing':
+      alternatives.push(...generateSpacingAlternatives(classInfo, contextClasses));
+      break;
+    case 'color':
+      alternatives.push(...generateColorAlternatives(classInfo, contextClasses));
+      break;
+    case 'border':
+      alternatives.push(...generateBorderAlternatives(classInfo, contextClasses));
+      break;
+    case 'typography':
+      alternatives.push(...generateTypographyAlternatives(classInfo, contextClasses));
+      break;
+    case 'layout':
+      alternatives.push(...generateLayoutAlternatives(classInfo, contextClasses));
+      break;
+    case 'effects':
+      alternatives.push(...generateEffectsAlternatives(classInfo, contextClasses));
+      break;
+    default:
+      // Fallback to simple alternatives
+      alternatives.push(...generateSimpleAlternatives(className));
+  }
+
+  // Add variant suggestions for the current class
+  alternatives.push(...generateVariantSuggestions(className));
+
+  // Remove duplicates and sort by relevance
+  return [...new Map(alternatives.map(alt => [alt.class, alt])).values()]
+    .sort((a, b) => b.score - a.score)
+    .map(alt => alt.class)
+    .slice(0, 20); // Limit to 20 suggestions
 }
+
+function parseClassInfo(className) {
+  // Handle variant prefixes like 'hover:', 'sm:', etc.
+  const variantMatch = className.match(/^([a-z]+):(.+)$/);
+  if (variantMatch) {
+    const [, variant, baseClass] = variantMatch;
+    const baseInfo = parseClassInfo(baseClass);
+    if (baseInfo) {
+      return { ...baseInfo, variant };
+    }
+  }
+
+  // Handle spacing classes (p-*, m-*, gap-*)
+  const spacingMatch = className.match(/^([pm]|(pt|pr|pb|pl|mt|mr|mb|ml|gap))-(\d+)$|^(rounded)(?:-(.+))?$/);
+  if (spacingMatch) {
+    const [, prefix, , value, rounded, size] = spacingMatch;
+    return {
+      type: rounded ? 'border' : 'spacing',
+      prefix: prefix || rounded,
+      value: value || size,
+      fullClass: className
+    };
+  }
+
+  // Handle color classes (bg-*, text-*, border-*)
+  const colorMatch = className.match(/^(bg|text|border)(?:-(.+))?$/);
+  if (colorMatch) {
+    const [, type, colorSpec] = colorMatch;
+    if (colorSpec) {
+      const colorMatch = colorSpec.match(/^(.+)-(\d+)$/);
+      if (colorMatch) {
+        const [, color, shade] = colorMatch;
+        return {
+          type: 'color',
+          category: type,
+          color,
+          shade,
+          fullClass: className
+        };
+      }
+    }
+  }
+
+  // Handle effects classes (shadow-*, etc.)
+  const effectsMatch = className.match(/^shadow(?:-(.+))?$/);
+  if (effectsMatch) {
+    return {
+      type: 'effects',
+      prefix: 'shadow',
+      value: effectsMatch[1] || '',
+      fullClass: className
+    };
+  }
+
+  // Handle layout classes
+  const layoutClasses = ['flex', 'block', 'inline', 'hidden', 'static', 'relative', 'absolute', 'fixed', 'sticky'];
+  if (layoutClasses.includes(className)) {
+    return {
+      type: 'layout',
+      category: 'display',
+      value: className,
+      fullClass: className
+    };
+  }
+
+  return null;
+}
+
+function generateSpacingAlternatives(classInfo, contextClasses) {
+  const alternatives = [];
+  const baseValue = parseInt(classInfo.value) || 0;
+
+  // Generate similar spacing values
+  const spacingSuggestions = [
+    Math.max(0, baseValue - 2),
+    Math.max(0, baseValue - 1),
+    baseValue + 1,
+    baseValue + 2,
+    baseValue + 3
+  ];
+
+  spacingSuggestions.forEach(value => {
+    if (value > 0 || classInfo.prefix === 'm') { // Allow margin 0
+      const newClass = `${classInfo.prefix}-${value}`;
+      alternatives.push({
+        class: newClass,
+        score: calculateAlternativeScore(newClass, contextClasses, 'spacing'),
+        reason: `Similar ${classInfo.prefix} value`
+      });
+    }
+  });
+
+  return alternatives;
+}
+
+function generateColorAlternatives(classInfo, contextClasses) {
+  const alternatives = [];
+
+  // Generate color variations
+  const shades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
+
+  // Same color, different shades
+  shades.forEach(shade => {
+    if (shade !== classInfo.shade) {
+      const newClass = `${classInfo.category}-${classInfo.color}-${shade}`;
+      alternatives.push({
+        class: newClass,
+        score: calculateAlternativeScore(newClass, contextClasses, 'color'),
+        reason: `${classInfo.color} ${shade}`
+      });
+    }
+  });
+
+  // Same shade, different colors (complementary/related)
+  const relatedColors = getRelatedColors(classInfo.color);
+  relatedColors.forEach(color => {
+    const newClass = `${classInfo.category}-${color}-${classInfo.shade}`;
+    alternatives.push({
+      class: newClass,
+      score: calculateAlternativeScore(newClass, contextClasses, 'color'),
+      reason: `${color} ${classInfo.shade}`
+    });
+  });
+
+  return alternatives;
+}
+
+function generateBorderAlternatives(classInfo, contextClasses) {
+  const alternatives = [];
+
+  if (classInfo.prefix === 'rounded') {
+    const sizes = ['', 'none', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', 'full'];
+    sizes.forEach(size => {
+      const newClass = size ? `rounded-${size}` : 'rounded';
+      alternatives.push({
+        class: newClass,
+        score: calculateAlternativeScore(newClass, contextClasses, 'border'),
+        reason: `Border radius ${size || 'default'}`
+      });
+    });
+  }
+
+  return alternatives;
+}
+
+function generateTypographyAlternatives(classInfo, contextClasses) {
+  const alternatives = [];
+  // Could include font weights, sizes, etc.
+  return alternatives;
+}
+
+function generateLayoutAlternatives(classInfo, contextClasses) {
+  const alternatives = [];
+  const layoutOptions = ['flex', 'block', 'inline', 'inline-block', 'grid', 'table', 'table-cell'];
+
+  layoutOptions.forEach(option => {
+    if (option !== classInfo.value) {
+      alternatives.push({
+        class: option,
+        score: calculateAlternativeScore(option, contextClasses, 'layout'),
+        reason: `Display ${option}`
+      });
+    }
+  });
+
+  return alternatives;
+}
+
+function generateEffectsAlternatives(classInfo, contextClasses) {
+  const alternatives = [];
+  const shadowOptions = ['', 'sm', 'md', 'lg', 'xl', '2xl', 'inner'];
+
+  shadowOptions.forEach(option => {
+    const newClass = option ? `shadow-${option}` : 'shadow';
+    alternatives.push({
+      class: newClass,
+      score: calculateAlternativeScore(newClass, contextClasses, 'effects'),
+      reason: `Shadow ${option || 'default'}`
+    });
+  });
+
+  return alternatives;
+}
+
+function generateVariantSuggestions(className) {
+  const alternatives = [];
+  const variants = ['sm:', 'md:', 'lg:', 'xl:', '2xl:', 'hover:', 'focus:', 'active:', 'visited:', 'disabled:'];
+
+  variants.forEach(variant => {
+    alternatives.push({
+      class: `${variant}${className}`,
+      score: 30,
+      reason: `${variant.slice(0, -1)} variant`
+    });
+  });
+
+  return alternatives;
+}
+
+function generateSimpleAlternatives(className) {
+  // Fallback for classes we can't parse
+  return [
+    { class: className + '-alternative', score: 20, reason: 'Alternative version' }
+  ];
+}
+
+function calculateAlternativeScore(alternativeClass, contextClasses, type) {
+  let score = 50; // Base score
+
+  // Boost score if similar to existing classes
+  contextClasses.forEach(cls => {
+    if (cls.startsWith(alternativeClass.split('-')[0])) {
+      score += 20;
+    }
+    if (cls.includes(alternativeClass)) {
+      score += 10;
+    }
+  });
+
+  // Boost score for common/useful classes
+  const commonClasses = ['p-4', 'p-6', 'm-4', 'bg-blue-500', 'text-white', 'rounded-lg', 'shadow-md'];
+  if (commonClasses.includes(alternativeClass)) {
+    score += 30;
+  }
+
+  return score;
+}
+
+function getRelatedColors(baseColor) {
+  const colorGroups = {
+    red: ['orange', 'pink', 'rose'],
+    blue: ['indigo', 'cyan', 'teal'],
+    green: ['emerald', 'lime', 'teal'],
+    yellow: ['amber', 'orange', 'yellow'],
+    purple: ['violet', 'fuchsia', 'pink'],
+    gray: ['slate', 'zinc', 'neutral'],
+    white: ['gray', 'blue-gray'],
+    black: ['gray', 'slate']
+  };
+
+  return colorGroups[baseColor] || ['gray', 'blue'];
+}
+
+function openClassAlternativesModal(className) {
+  // Use a more robust approach to find modal elements
+  function getModal() {
+    return document.getElementById('class-alternatives-modal') ||
+           panel.querySelector('#class-alternatives-modal');
+  }
+
+  function getModalTitle() {
+    const modal = getModal();
+    return modal?.querySelector('h3 code');
+  }
+
+  function getAlternativesGrid() {
+    const modal = getModal();
+    return modal?.querySelector('.grid');
+  }
+
+  // Try to get modal elements immediately
+  let modal = getModal();
+  let modalTitle = getModalTitle();
+  let alternativesGrid = getAlternativesGrid();
+
+  if (!modal || !modalTitle || !alternativesGrid) {
+    // If modal elements aren't ready yet, wait and try again
+    let attempts = 0;
+    const maxAttempts = 20; // Try for 2 seconds
+
+    const interval = setInterval(() => {
+      attempts++;
+      modal = getModal();
+      modalTitle = getModalTitle();
+      alternativesGrid = getAlternativesGrid();
+
+      if (modal && modalTitle && alternativesGrid) {
+        clearInterval(interval);
+        openModalFunctionality(modal, modalTitle, alternativesGrid);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        console.log('Class alternatives modal not found - could not open');
+      }
+    }, 100);
+  } else {
+    openModalFunctionality(modal, modalTitle, alternativesGrid);
+  }
+
+  function openModalFunctionality(modal, modalTitle, alternativesGrid) {
+    // Update modal title
+    modalTitle.textContent = className;
+
+    // Get current applied classes as context
+    const contextClasses = selectedElement ? Array.from(selectedElement.classList) : [];
+
+    // Generate alternatives with context
+    const alternatives = generateClassAlternatives(className, contextClasses);
+
+    // Clear existing alternatives
+    alternativesGrid.innerHTML = '';
+
+    // Add alternatives to the grid with enhanced display
+    alternatives.forEach(alternative => {
+      const alternativeItem = document.createElement('div');
+      alternativeItem.className = 'bg-gray-50 hover:bg-gray-100 p-2 rounded text-sm font-mono cursor-pointer transition-colors border border-gray-200';
+
+      // Find the reason for this alternative (we'd need to modify generateClassAlternatives to return this info)
+      alternativeItem.textContent = alternative;
+      alternativeItem.setAttribute('title', `Alternative to ${className}`);
+
+      alternativeItem.addEventListener('click', () => {
+        previewClassAlternative(alternative, className);
+      });
+      alternativesGrid.appendChild(alternativeItem);
+    });
+
+    // Show modal
+    modal.style.display = 'flex';
+
+    // Add escape key handler
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+
+    // Add click outside handler
+    const handleClickOutside = (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    };
+
+    function closeModal() {
+      modal.style.display = 'none';
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('click', handleClickOutside);
+    }
+
+    // Set up event listeners
+    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('click', handleClickOutside);
+  }
+}
+
+function previewClassAlternative(alternative, originalClass) {
+  if (!selectedElement) return;
+
+  // Remove original class and add alternative
+  selectedElement.classList.remove(originalClass);
+  selectedElement.classList.add(alternative);
+
+  // Update displayed classes
+  const classes = Array.from(selectedElement.classList);
+  displayAppliedClasses(classes);
+  generateSuggestions(classes);
+
+  // Close modal after successful preview
+  const modal = document.getElementById('class-alternatives-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+  // Initialize when DOM is loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeExtension);
+  } else {
+    // DOMContentLoaded already fired
+    initializeExtension();
+  }
+
+})(); // End of IIFE

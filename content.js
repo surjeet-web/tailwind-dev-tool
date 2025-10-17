@@ -15,6 +15,299 @@
   let isInspecting = false;
   let tailwindIntelligence;
 
+  // Embedded Tailwind Intelligence System for 0ms loading
+  class TailwindIntelligence {
+    constructor() {
+      this.classDatabase = new Map();
+      this.initialized = false;
+      this.initializeDatabase();
+    }
+
+    initializeDatabase() {
+      // Quick initialization with essential classes
+      const classes = [
+        // Spacing
+        { name: 'p-0', description: 'Padding 0', category: 'spacing', css: 'padding: 0' },
+        { name: 'p-1', description: 'Padding 0.25rem (4px)', category: 'spacing', css: 'padding: 0.25rem' },
+        { name: 'p-2', description: 'Padding 0.5rem (8px)', category: 'spacing', css: 'padding: 0.5rem' },
+        { name: 'p-3', description: 'Padding 0.75rem (12px)', category: 'spacing', css: 'padding: 0.75rem' },
+        { name: 'p-4', description: 'Padding 1rem (16px)', category: 'spacing', css: 'padding: 1rem' },
+        { name: 'p-5', description: 'Padding 1.25rem (20px)', category: 'spacing', css: 'padding: 1.25rem' },
+        { name: 'p-6', description: 'Padding 1.5rem (24px)', category: 'spacing', css: 'padding: 1.5rem' },
+        { name: 'p-8', description: 'Padding 2rem (32px)', category: 'spacing', css: 'padding: 2rem' },
+        { name: 'p-10', description: 'Padding 2.5rem (40px)', category: 'spacing', css: 'padding: 2.5rem' },
+        { name: 'p-12', description: 'Padding 3rem (48px)', category: 'spacing', css: 'padding: 3rem' },
+        
+        { name: 'm-0', description: 'Margin 0', category: 'spacing', css: 'margin: 0' },
+        { name: 'm-1', description: 'Margin 0.25rem (4px)', category: 'spacing', css: 'margin: 0.25rem' },
+        { name: 'm-2', description: 'Margin 0.5rem (8px)', category: 'spacing', css: 'margin: 0.5rem' },
+        { name: 'm-3', description: 'Margin 0.75rem (12px)', category: 'spacing', css: 'margin: 0.75rem' },
+        { name: 'm-4', description: 'Margin 1rem (16px)', category: 'spacing', css: 'margin: 1rem' },
+        { name: 'm-5', description: 'Margin 1.25rem (20px)', category: 'spacing', css: 'margin: 1.25rem' },
+        { name: 'm-6', description: 'Margin 1.5rem (24px)', category: 'spacing', css: 'margin: 1.5rem' },
+        { name: 'm-8', description: 'Margin 2rem (32px)', category: 'spacing', css: 'margin: 2rem' },
+        { name: 'm-10', description: 'Margin 2.5rem (40px)', category: 'spacing', css: 'margin: 2.5rem' },
+        { name: 'm-12', description: 'Margin 3rem (48px)', category: 'spacing', css: 'margin: 3rem' },
+
+        // Colors - Background
+        { name: 'bg-white', description: 'White background', category: 'colors', css: 'background-color: #ffffff' },
+        { name: 'bg-black', description: 'Black background', category: 'colors', css: 'background-color: #000000' },
+        { name: 'bg-red-50', description: 'Red 50 background', category: 'colors', css: 'background-color: #fef2f2' },
+        { name: 'bg-red-100', description: 'Red 100 background', category: 'colors', css: 'background-color: #fee2e2' },
+        { name: 'bg-red-200', description: 'Red 200 background', category: 'colors', css: 'background-color: #fecaca' },
+        { name: 'bg-red-300', description: 'Red 300 background', category: 'colors', css: 'background-color: #fca5a5' },
+        { name: 'bg-red-400', description: 'Red 400 background', category: 'colors', css: 'background-color: #f87171' },
+        { name: 'bg-red-500', description: 'Red 500 background', category: 'colors', css: 'background-color: #ef4444' },
+        { name: 'bg-red-600', description: 'Red 600 background', category: 'colors', css: 'background-color: #dc2626' },
+        { name: 'bg-red-700', description: 'Red 700 background', category: 'colors', css: 'background-color: #b91c1c' },
+        { name: 'bg-red-800', description: 'Red 800 background', category: 'colors', css: 'background-color: #991b1b' },
+        { name: 'bg-red-900', description: 'Red 900 background', category: 'colors', css: 'background-color: #7f1d1d' },
+        
+        { name: 'bg-blue-50', description: 'Blue 50 background', category: 'colors', css: 'background-color: #eff6ff' },
+        { name: 'bg-blue-100', description: 'Blue 100 background', category: 'colors', css: 'background-color: #dbeafe' },
+        { name: 'bg-blue-200', description: 'Blue 200 background', category: 'colors', css: 'background-color: #bfdbfe' },
+        { name: 'bg-blue-300', description: 'Blue 300 background', category: 'colors', css: 'background-color: #93c5fd' },
+        { name: 'bg-blue-400', description: 'Blue 400 background', category: 'colors', css: 'background-color: #60a5fa' },
+        { name: 'bg-blue-500', description: 'Blue 500 background', category: 'colors', css: 'background-color: #3b82f6' },
+        { name: 'bg-blue-600', description: 'Blue 600 background', category: 'colors', css: 'background-color: #2563eb' },
+        { name: 'bg-blue-700', description: 'Blue 700 background', category: 'colors', css: 'background-color: #1d4ed8' },
+        { name: 'bg-blue-800', description: 'Blue 800 background', category: 'colors', css: 'background-color: #1e40af' },
+        { name: 'bg-blue-900', description: 'Blue 900 background', category: 'colors', css: 'background-color: #1e3a8a' },
+
+        { name: 'bg-green-50', description: 'Green 50 background', category: 'colors', css: 'background-color: #f0fdf4' },
+        { name: 'bg-green-100', description: 'Green 100 background', category: 'colors', css: 'background-color: #dcfce7' },
+        { name: 'bg-green-200', description: 'Green 200 background', category: 'colors', css: 'background-color: #bbf7d0' },
+        { name: 'bg-green-300', description: 'Green 300 background', category: 'colors', css: 'background-color: #86efac' },
+        { name: 'bg-green-400', description: 'Green 400 background', category: 'colors', css: 'background-color: #4ade80' },
+        { name: 'bg-green-500', description: 'Green 500 background', category: 'colors', css: 'background-color: #22c55e' },
+        { name: 'bg-green-600', description: 'Green 600 background', category: 'colors', css: 'background-color: #16a34a' },
+        { name: 'bg-green-700', description: 'Green 700 background', category: 'colors', css: 'background-color: #15803d' },
+        { name: 'bg-green-800', description: 'Green 800 background', category: 'colors', css: 'background-color: #166534' },
+        { name: 'bg-green-900', description: 'Green 900 background', category: 'colors', css: 'background-color: #14532d' },
+
+        { name: 'bg-gray-50', description: 'Gray 50 background', category: 'colors', css: 'background-color: #f9fafb' },
+        { name: 'bg-gray-100', description: 'Gray 100 background', category: 'colors', css: 'background-color: #f3f4f6' },
+        { name: 'bg-gray-200', description: 'Gray 200 background', category: 'colors', css: 'background-color: #e5e7eb' },
+        { name: 'bg-gray-300', description: 'Gray 300 background', category: 'colors', css: 'background-color: #d1d5db' },
+        { name: 'bg-gray-400', description: 'Gray 400 background', category: 'colors', css: 'background-color: #9ca3af' },
+        { name: 'bg-gray-500', description: 'Gray 500 background', category: 'colors', css: 'background-color: #6b7280' },
+        { name: 'bg-gray-600', description: 'Gray 600 background', category: 'colors', css: 'background-color: #4b5563' },
+        { name: 'bg-gray-700', description: 'Gray 700 background', category: 'colors', css: 'background-color: #374151' },
+        { name: 'bg-gray-800', description: 'Gray 800 background', category: 'colors', css: 'background-color: #1f2937' },
+        { name: 'bg-gray-900', description: 'Gray 900 background', category: 'colors', css: 'background-color: #111827' },
+
+        // Colors - Text
+        { name: 'text-white', description: 'White text color', category: 'colors', css: 'color: #ffffff' },
+        { name: 'text-black', description: 'Black text color', category: 'colors', css: 'color: #000000' },
+        { name: 'text-red-500', description: 'Red 500 text', category: 'colors', css: 'color: #ef4444' },
+        { name: 'text-red-600', description: 'Red 600 text', category: 'colors', css: 'color: #dc2626' },
+        { name: 'text-blue-500', description: 'Blue 500 text', category: 'colors', css: 'color: #3b82f6' },
+        { name: 'text-blue-600', description: 'Blue 600 text', category: 'colors', css: 'color: #2563eb' },
+        { name: 'text-gray-500', description: 'Gray 500 text', category: 'colors', css: 'color: #6b7280' },
+        { name: 'text-gray-600', description: 'Gray 600 text', category: 'colors', css: 'color: #4b5563' },
+        { name: 'text-gray-700', description: 'Gray 700 text', category: 'colors', css: 'color: #374151' },
+        { name: 'text-gray-800', description: 'Gray 800 text', category: 'colors', css: 'color: #1f2937' },
+        { name: 'text-gray-900', description: 'Gray 900 text', category: 'colors', css: 'color: #111827' },
+
+        // Borders
+        { name: 'rounded', description: 'Border radius 0.25rem', category: 'borders', css: 'border-radius: 0.25rem' },
+        { name: 'rounded-none', description: 'No border radius', category: 'borders', css: 'border-radius: 0' },
+        { name: 'rounded-sm', description: 'Small border radius', category: 'borders', css: 'border-radius: 0.125rem' },
+        { name: 'rounded-md', description: 'Medium border radius', category: 'borders', css: 'border-radius: 0.375rem' },
+        { name: 'rounded-lg', description: 'Large border radius', category: 'borders', css: 'border-radius: 0.5rem' },
+        { name: 'rounded-xl', description: 'Extra large border radius', category: 'borders', css: 'border-radius: 0.75rem' },
+        { name: 'rounded-2xl', description: '2x large border radius', category: 'borders', css: 'border-radius: 1rem' },
+        { name: 'rounded-full', description: 'Full border radius', category: 'borders', css: 'border-radius: 9999px' },
+
+        // Effects
+        { name: 'shadow', description: 'Box shadow', category: 'effects', css: 'box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)' },
+        { name: 'shadow-sm', description: 'Small shadow', category: 'effects', css: 'box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05)' },
+        { name: 'shadow-md', description: 'Medium shadow', category: 'effects', css: 'box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' },
+        { name: 'shadow-lg', description: 'Large shadow', category: 'effects', css: 'box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)' },
+        { name: 'shadow-xl', description: 'Extra large shadow', category: 'effects', css: 'box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' },
+        { name: 'shadow-2xl', description: '2x large shadow', category: 'effects', css: 'box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25)' },
+        { name: 'shadow-none', description: 'No shadow', category: 'effects', css: 'box-shadow: 0 0 #0000' },
+
+        // Layout
+        { name: 'flex', description: 'Display flex', category: 'layout', css: 'display: flex' },
+        { name: 'block', description: 'Display block', category: 'layout', css: 'display: block' },
+        { name: 'inline', description: 'Display inline', category: 'layout', css: 'display: inline' },
+        { name: 'inline-block', description: 'Display inline-block', category: 'layout', css: 'display: inline-block' },
+        { name: 'hidden', description: 'Display none', category: 'layout', css: 'display: none' },
+        { name: 'grid', description: 'Display grid', category: 'layout', css: 'display: grid' },
+
+        // Typography
+        { name: 'font-thin', description: 'Font weight 100', category: 'typography', css: 'font-weight: 100' },
+        { name: 'font-light', description: 'Font weight 300', category: 'typography', css: 'font-weight: 300' },
+        { name: 'font-normal', description: 'Font weight 400', category: 'typography', css: 'font-weight: 400' },
+        { name: 'font-medium', description: 'Font weight 500', category: 'typography', css: 'font-weight: 500' },
+        { name: 'font-semibold', description: 'Font weight 600', category: 'typography', css: 'font-weight: 600' },
+        { name: 'font-bold', description: 'Font weight 700', category: 'typography', css: 'font-weight: 700' },
+        { name: 'font-extrabold', description: 'Font weight 800', category: 'typography', css: 'font-weight: 800' },
+        { name: 'font-black', description: 'Font weight 900', category: 'typography', css: 'font-weight: 900' },
+
+        // Text sizes
+        { name: 'text-xs', description: 'Font size 0.75rem (12px)', category: 'typography', css: 'font-size: 0.75rem; line-height: 1rem' },
+        { name: 'text-sm', description: 'Font size 0.875rem (14px)', category: 'typography', css: 'font-size: 0.875rem; line-height: 1.25rem' },
+        { name: 'text-base', description: 'Font size 1rem (16px)', category: 'typography', css: 'font-size: 1rem; line-height: 1.5rem' },
+        { name: 'text-lg', description: 'Font size 1.125rem (18px)', category: 'typography', css: 'font-size: 1.125rem; line-height: 1.75rem' },
+        { name: 'text-xl', description: 'Font size 1.25rem (20px)', category: 'typography', css: 'font-size: 1.25rem; line-height: 1.75rem' },
+        { name: 'text-2xl', description: 'Font size 1.5rem (24px)', category: 'typography', css: 'font-size: 1.5rem; line-height: 2rem' },
+        { name: 'text-3xl', description: 'Font size 1.875rem (30px)', category: 'typography', css: 'font-size: 1.875rem; line-height: 2.25rem' },
+        { name: 'text-4xl', description: 'Font size 2.25rem (36px)', category: 'typography', css: 'font-size: 2.25rem; line-height: 2.5rem' }
+      ];
+
+      // Add all classes to database
+      classes.forEach(cls => {
+        this.classDatabase.set(cls.name, {
+          ...cls,
+          alternatives: this.generateAlternatives(cls.name),
+          variants: ['responsive', 'hover', 'focus']
+        });
+      });
+
+      this.initialized = true;
+      console.log(`Tailwind Intelligence initialized with ${this.classDatabase.size} classes`);
+    }
+
+    generateAlternatives(className) {
+      const alternatives = [];
+      
+      if (className.startsWith('p-')) {
+        const values = ['0', '1', '2', '3', '4', '5', '6', '8', '10', '12'];
+        values.forEach(val => {
+          const alt = `p-${val}`;
+          if (alt !== className) alternatives.push(alt);
+        });
+      } else if (className.startsWith('m-')) {
+        const values = ['0', '1', '2', '3', '4', '5', '6', '8', '10', '12'];
+        values.forEach(val => {
+          const alt = `m-${val}`;
+          if (alt !== className) alternatives.push(alt);
+        });
+      } else if (className.startsWith('bg-')) {
+        if (className.includes('-')) {
+          const parts = className.split('-');
+          if (parts.length >= 3) {
+            const color = parts[1];
+            const shades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
+            shades.forEach(shade => alternatives.push(`bg-${color}-${shade}`));
+          }
+        }
+        const colors = ['red', 'blue', 'green', 'gray', 'white', 'black'];
+        colors.forEach(color => {
+          if (color === 'white' || color === 'black') {
+            alternatives.push(`bg-${color}`);
+          } else {
+            alternatives.push(`bg-${color}-500`);
+          }
+        });
+      } else if (className.startsWith('text-')) {
+        const colors = ['red', 'blue', 'green', 'gray', 'white', 'black'];
+        colors.forEach(color => {
+          if (color === 'white' || color === 'black') {
+            alternatives.push(`text-${color}`);
+          } else {
+            alternatives.push(`text-${color}-500`);
+          }
+        });
+      } else if (className.startsWith('rounded')) {
+        const sizes = ['rounded-none', 'rounded-sm', 'rounded', 'rounded-md', 'rounded-lg', 'rounded-xl', 'rounded-2xl', 'rounded-full'];
+        alternatives.push(...sizes.filter(s => s !== className));
+      } else if (className.startsWith('shadow')) {
+        const sizes = ['shadow-none', 'shadow-sm', 'shadow', 'shadow-md', 'shadow-lg', 'shadow-xl', 'shadow-2xl'];
+        alternatives.push(...sizes.filter(s => s !== className));
+      } else if (className.startsWith('font-')) {
+        const weights = ['font-thin', 'font-light', 'font-normal', 'font-medium', 'font-semibold', 'font-bold', 'font-extrabold', 'font-black'];
+        alternatives.push(...weights.filter(w => w !== className));
+      } else if (className.startsWith('text-') && ['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl'].some(size => className.includes(size))) {
+        const sizes = ['text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl', 'text-4xl'];
+        alternatives.push(...sizes.filter(s => s !== className));
+      }
+
+      return alternatives.slice(0, 12);
+    }
+
+    search(query, limit = 15) {
+      if (!this.initialized || !query) return [];
+
+      const queryLower = query.toLowerCase().trim();
+      const results = [];
+
+      for (const [className, classInfo] of this.classDatabase) {
+        let score = 0;
+
+        if (className === queryLower) score = 1000;
+        else if (className.startsWith(queryLower)) score = 900;
+        else if (className.includes(queryLower)) score = 700;
+        else if (classInfo.description.toLowerCase().includes(queryLower)) score = 500;
+        else if (classInfo.category.toLowerCase().includes(queryLower)) score = 300;
+
+        if (score > 0) {
+          results.push({ ...classInfo, score });
+        }
+      }
+
+      return results.sort((a, b) => b.score - a.score).slice(0, limit);
+    }
+
+    getAlternatives(className, limit = 12) {
+      const classInfo = this.classDatabase.get(className);
+      if (!classInfo) return [];
+
+      return (classInfo.alternatives || [])
+        .slice(0, limit)
+        .map(altClassName => {
+          const altInfo = this.classDatabase.get(altClassName);
+          return {
+            name: altClassName,
+            description: altInfo?.description || altClassName,
+            category: altInfo?.category || 'utility',
+            css: altInfo?.css || ''
+          };
+        });
+    }
+
+    getContextualSuggestions(existingClasses = [], limit = 8) {
+      const suggestions = [];
+      const categories = new Set();
+      
+      existingClasses.forEach(className => {
+        const classInfo = this.classDatabase.get(className);
+        if (classInfo) categories.add(classInfo.category);
+      });
+
+      if (categories.has('layout') && !categories.has('spacing')) {
+        suggestions.push('p-4', 'p-6', 'm-4');
+      }
+      
+      if (categories.has('colors') && !categories.has('effects')) {
+        suggestions.push('shadow-md', 'rounded-lg');
+      }
+      
+      if (categories.has('spacing') && !categories.has('colors')) {
+        suggestions.push('bg-white', 'text-gray-900');
+      }
+
+      if (categories.size === 0) {
+        suggestions.push('flex', 'p-4', 'bg-white', 'text-gray-900', 'rounded-lg', 'shadow-md');
+      }
+
+      return suggestions
+        .filter(className => !existingClasses.includes(className))
+        .slice(0, limit)
+        .map(className => {
+          const classInfo = this.classDatabase.get(className);
+          return {
+            name: className,
+            description: classInfo?.description || className,
+            category: classInfo?.category || 'utility',
+            css: classInfo?.css || ''
+          };
+        });
+    }
+  }
+
 
 
   // Create element highlighter
@@ -140,21 +433,10 @@
     return panelElement;
   }
 
-  // Initialize Tailwind Intelligence
+  // Initialize Tailwind Intelligence (instant - 0ms delay)
   function initializeTailwindIntelligence() {
-    // Load the intelligence system
-    const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('tailwind-intelligence.js');
-    script.onload = () => {
-      tailwindIntelligence = new window.TailwindIntelligence();
-      console.log('Tailwind Intelligence system loaded successfully');
-    };
-    script.onerror = () => {
-      console.error('Failed to load Tailwind Intelligence system');
-      // Fallback to basic functionality
-      tailwindIntelligence = null;
-    };
-    document.head.appendChild(script);
+    tailwindIntelligence = new TailwindIntelligence();
+    console.log('Tailwind Intelligence initialized instantly!');
   }
 
   // Search functionality
@@ -189,14 +471,22 @@
   }
 
   function performSearch(query, searchSuggestions) {
-    if (!tailwindIntelligence) {
-      searchSuggestions.innerHTML = `
-        <div style="padding: 12px; color: #6B7280; text-align: center; font-size: 14px;">
-          Intelligence system loading...
-        </div>
-      `;
-      searchSuggestions.style.display = 'block';
-      return;
+    if (!tailwindIntelligence || !tailwindIntelligence.initialized) {
+      // Initialize immediately if not ready
+      if (!tailwindIntelligence) {
+        initializeTailwindIntelligence();
+      }
+      
+      // If still not ready, show loading (should never happen now)
+      if (!tailwindIntelligence || !tailwindIntelligence.initialized) {
+        searchSuggestions.innerHTML = `
+          <div style="padding: 12px; color: #6B7280; text-align: center; font-size: 14px;">
+            Initializing intelligence...
+          </div>
+        `;
+        searchSuggestions.style.display = 'block';
+        return;
+      }
     }
 
     const results = tailwindIntelligence.search(query, 12);
@@ -276,12 +566,12 @@
       return;
     }
 
+    // Initialize Tailwind Intelligence FIRST (0ms delay)
+    initializeTailwindIntelligence();
+
     // Create UI elements
     highlighter = createHighlighter();
     panel = createFloatingPanel();
-
-    // Initialize Tailwind Intelligence
-    initializeTailwindIntelligence();
 
     // Set up functionality
     setupEventListeners();
@@ -573,14 +863,21 @@
     
     modalClassName.textContent = className;
     
-    if (!tailwindIntelligence) {
-      alternativesGrid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #6B7280;">
-          Intelligence system loading...
-        </div>
-      `;
-      modal.style.display = 'flex';
-      return;
+    if (!tailwindIntelligence || !tailwindIntelligence.initialized) {
+      // Initialize immediately if not ready
+      if (!tailwindIntelligence) {
+        initializeTailwindIntelligence();
+      }
+      
+      if (!tailwindIntelligence || !tailwindIntelligence.initialized) {
+        alternativesGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #6B7280;">
+            Initializing intelligence...
+          </div>
+        `;
+        modal.style.display = 'flex';
+        return;
+      }
     }
 
     // Get detailed alternatives with descriptions
@@ -659,8 +956,15 @@
 
   // Generate class alternatives using Tailwind Intelligence
   function generateClassAlternatives(className) {
-    if (!tailwindIntelligence) {
-      return []; // Return empty if intelligence system not loaded
+    if (!tailwindIntelligence || !tailwindIntelligence.initialized) {
+      // Initialize immediately if not ready
+      if (!tailwindIntelligence) {
+        initializeTailwindIntelligence();
+      }
+      
+      if (!tailwindIntelligence || !tailwindIntelligence.initialized) {
+        return []; // Return empty if still not ready
+      }
     }
 
     const alternatives = tailwindIntelligence.getAlternatives(className, 15);
@@ -701,9 +1005,16 @@
 
   // Generate intelligent class suggestions
   function generateSuggestions(classes) {
-    if (!tailwindIntelligence) {
-      document.getElementById('suggestions').style.display = 'none';
-      return;
+    if (!tailwindIntelligence || !tailwindIntelligence.initialized) {
+      // Initialize immediately if not ready
+      if (!tailwindIntelligence) {
+        initializeTailwindIntelligence();
+      }
+      
+      if (!tailwindIntelligence || !tailwindIntelligence.initialized) {
+        document.getElementById('suggestions').style.display = 'none';
+        return;
+      }
     }
 
     // Get contextual suggestions based on existing classes

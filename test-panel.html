@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Tailwind Dev Tools Panel</title>
+    <script src="content.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3B82F6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #2563EB;
+        }
+        .test-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-content">
+        <h1>Test Tailwind Dev Tools Panel</h1>
+        <p>This is a test page to verify the panel functionality.</p>
+
+        <div class="test-card">
+            <h3>Test Elements</h3>
+            <button class="test-button" id="test-btn-1">Button 1</button>
+            <button class="test-button" id="test-btn-2">Button 2</button>
+            <button class="test-button" id="test-btn-3">Button 3</button>
+        </div>
+
+        <div class="test-card">
+            <h3>Test Content</h3>
+            <p>This is some sample content to test the element inspector functionality.</p>
+            <div class="test-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0;">
+                <div class="grid-item" style="background: #e5e7eb; padding: 20px; text-align: center;">Item 1</div>
+                <div class="grid-item" style="background: #d1d5db; padding: 20px; text-align: center;">Item 2</div>
+                <div class="grid-item" style="background: #9ca3af; padding: 20px; text-align: center;">Item 3</div>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h3>Panel Control</h3>
+            <button class="test-button" onclick="togglePanel()">Toggle Panel</button>
+            <button class="test-button" onclick="startInspection()">Start Inspection</button>
+            <button class="test-button" onclick="stopInspection()">Stop Inspection</button>
+        </div>
+    </div>
+
+    <script>
+        // Test functions to manually trigger panel actions
+        function togglePanel() {
+            if (typeof window.togglePanel === 'function') {
+                window.togglePanel();
+            } else {
+                console.log('togglePanel function not available');
+            }
+        }
+
+        function startInspection() {
+            if (typeof window.startInspection === 'function') {
+                window.startInspection();
+            } else {
+                console.log('startInspection function not available');
+            }
+        }
+
+        function stopInspection() {
+            if (typeof window.stopInspection === 'function') {
+                window.stopInspection();
+            } else {
+                console.log('stopInspection function not available');
+            }
+        }
+    </script>
+</body>
+</html>

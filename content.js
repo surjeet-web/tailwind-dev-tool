@@ -13,130 +13,9 @@
   let panel;
   let selectedElement = null;
   let isInspecting = false;
-  let tailwindClasses = [];
+  let tailwindIntelligence;
 
-  // Comprehensive Tailwind classes database (fallback)
-  const fallbackClasses = [
-    // Spacing
-    { class: 'p-0', description: 'Padding 0', category: 'spacing' },
-    { class: 'p-1', description: 'Padding 0.25rem (4px)', category: 'spacing' },
-    { class: 'p-2', description: 'Padding 0.5rem (8px)', category: 'spacing' },
-    { class: 'p-3', description: 'Padding 0.75rem (12px)', category: 'spacing' },
-    { class: 'p-4', description: 'Padding 1rem (16px)', category: 'spacing' },
-    { class: 'p-5', description: 'Padding 1.25rem (20px)', category: 'spacing' },
-    { class: 'p-6', description: 'Padding 1.5rem (24px)', category: 'spacing' },
-    { class: 'p-8', description: 'Padding 2rem (32px)', category: 'spacing' },
-    { class: 'p-10', description: 'Padding 2.5rem (40px)', category: 'spacing' },
-    { class: 'p-12', description: 'Padding 3rem (48px)', category: 'spacing' },
-    
-    { class: 'm-0', description: 'Margin 0', category: 'spacing' },
-    { class: 'm-1', description: 'Margin 0.25rem (4px)', category: 'spacing' },
-    { class: 'm-2', description: 'Margin 0.5rem (8px)', category: 'spacing' },
-    { class: 'm-3', description: 'Margin 0.75rem (12px)', category: 'spacing' },
-    { class: 'm-4', description: 'Margin 1rem (16px)', category: 'spacing' },
-    { class: 'm-5', description: 'Margin 1.25rem (20px)', category: 'spacing' },
-    { class: 'm-6', description: 'Margin 1.5rem (24px)', category: 'spacing' },
-    { class: 'm-8', description: 'Margin 2rem (32px)', category: 'spacing' },
-    { class: 'm-10', description: 'Margin 2.5rem (40px)', category: 'spacing' },
-    { class: 'm-12', description: 'Margin 3rem (48px)', category: 'spacing' },
 
-    // Colors - Background
-    { class: 'bg-white', description: 'White background', category: 'colors' },
-    { class: 'bg-black', description: 'Black background', category: 'colors' },
-    { class: 'bg-red-50', description: 'Red 50 background', category: 'colors' },
-    { class: 'bg-red-100', description: 'Red 100 background', category: 'colors' },
-    { class: 'bg-red-200', description: 'Red 200 background', category: 'colors' },
-    { class: 'bg-red-300', description: 'Red 300 background', category: 'colors' },
-    { class: 'bg-red-400', description: 'Red 400 background', category: 'colors' },
-    { class: 'bg-red-500', description: 'Red 500 background', category: 'colors' },
-    { class: 'bg-red-600', description: 'Red 600 background', category: 'colors' },
-    { class: 'bg-red-700', description: 'Red 700 background', category: 'colors' },
-    { class: 'bg-red-800', description: 'Red 800 background', category: 'colors' },
-    { class: 'bg-red-900', description: 'Red 900 background', category: 'colors' },
-    
-    { class: 'bg-blue-50', description: 'Blue 50 background', category: 'colors' },
-    { class: 'bg-blue-100', description: 'Blue 100 background', category: 'colors' },
-    { class: 'bg-blue-200', description: 'Blue 200 background', category: 'colors' },
-    { class: 'bg-blue-300', description: 'Blue 300 background', category: 'colors' },
-    { class: 'bg-blue-400', description: 'Blue 400 background', category: 'colors' },
-    { class: 'bg-blue-500', description: 'Blue 500 background', category: 'colors' },
-    { class: 'bg-blue-600', description: 'Blue 600 background', category: 'colors' },
-    { class: 'bg-blue-700', description: 'Blue 700 background', category: 'colors' },
-    { class: 'bg-blue-800', description: 'Blue 800 background', category: 'colors' },
-    { class: 'bg-blue-900', description: 'Blue 900 background', category: 'colors' },
-
-    { class: 'bg-green-50', description: 'Green 50 background', category: 'colors' },
-    { class: 'bg-green-100', description: 'Green 100 background', category: 'colors' },
-    { class: 'bg-green-200', description: 'Green 200 background', category: 'colors' },
-    { class: 'bg-green-300', description: 'Green 300 background', category: 'colors' },
-    { class: 'bg-green-400', description: 'Green 400 background', category: 'colors' },
-    { class: 'bg-green-500', description: 'Green 500 background', category: 'colors' },
-    { class: 'bg-green-600', description: 'Green 600 background', category: 'colors' },
-    { class: 'bg-green-700', description: 'Green 700 background', category: 'colors' },
-    { class: 'bg-green-800', description: 'Green 800 background', category: 'colors' },
-    { class: 'bg-green-900', description: 'Green 900 background', category: 'colors' },
-
-    { class: 'bg-gray-50', description: 'Gray 50 background', category: 'colors' },
-    { class: 'bg-gray-100', description: 'Gray 100 background', category: 'colors' },
-    { class: 'bg-gray-200', description: 'Gray 200 background', category: 'colors' },
-    { class: 'bg-gray-300', description: 'Gray 300 background', category: 'colors' },
-    { class: 'bg-gray-400', description: 'Gray 400 background', category: 'colors' },
-    { class: 'bg-gray-500', description: 'Gray 500 background', category: 'colors' },
-    { class: 'bg-gray-600', description: 'Gray 600 background', category: 'colors' },
-    { class: 'bg-gray-700', description: 'Gray 700 background', category: 'colors' },
-    { class: 'bg-gray-800', description: 'Gray 800 background', category: 'colors' },
-    { class: 'bg-gray-900', description: 'Gray 900 background', category: 'colors' },
-
-    // Colors - Text
-    { class: 'text-white', description: 'White text color', category: 'colors' },
-    { class: 'text-black', description: 'Black text color', category: 'colors' },
-    { class: 'text-red-500', description: 'Red 500 text', category: 'colors' },
-    { class: 'text-red-600', description: 'Red 600 text', category: 'colors' },
-    { class: 'text-blue-500', description: 'Blue 500 text', category: 'colors' },
-    { class: 'text-blue-600', description: 'Blue 600 text', category: 'colors' },
-    { class: 'text-gray-500', description: 'Gray 500 text', category: 'colors' },
-    { class: 'text-gray-600', description: 'Gray 600 text', category: 'colors' },
-    { class: 'text-gray-700', description: 'Gray 700 text', category: 'colors' },
-    { class: 'text-gray-800', description: 'Gray 800 text', category: 'colors' },
-    { class: 'text-gray-900', description: 'Gray 900 text', category: 'colors' },
-
-    // Borders
-    { class: 'rounded', description: 'Border radius 0.25rem', category: 'borders' },
-    { class: 'rounded-none', description: 'No border radius', category: 'borders' },
-    { class: 'rounded-sm', description: 'Small border radius', category: 'borders' },
-    { class: 'rounded-md', description: 'Medium border radius', category: 'borders' },
-    { class: 'rounded-lg', description: 'Large border radius', category: 'borders' },
-    { class: 'rounded-xl', description: 'Extra large border radius', category: 'borders' },
-    { class: 'rounded-2xl', description: '2x large border radius', category: 'borders' },
-    { class: 'rounded-full', description: 'Full border radius', category: 'borders' },
-
-    // Effects
-    { class: 'shadow', description: 'Box shadow', category: 'effects' },
-    { class: 'shadow-sm', description: 'Small shadow', category: 'effects' },
-    { class: 'shadow-md', description: 'Medium shadow', category: 'effects' },
-    { class: 'shadow-lg', description: 'Large shadow', category: 'effects' },
-    { class: 'shadow-xl', description: 'Extra large shadow', category: 'effects' },
-    { class: 'shadow-2xl', description: '2x large shadow', category: 'effects' },
-    { class: 'shadow-none', description: 'No shadow', category: 'effects' },
-
-    // Layout
-    { class: 'flex', description: 'Display flex', category: 'layout' },
-    { class: 'block', description: 'Display block', category: 'layout' },
-    { class: 'inline', description: 'Display inline', category: 'layout' },
-    { class: 'inline-block', description: 'Display inline-block', category: 'layout' },
-    { class: 'hidden', description: 'Display none', category: 'layout' },
-    { class: 'grid', description: 'Display grid', category: 'layout' },
-
-    // Typography
-    { class: 'font-thin', description: 'Font weight 100', category: 'typography' },
-    { class: 'font-light', description: 'Font weight 300', category: 'typography' },
-    { class: 'font-normal', description: 'Font weight 400', category: 'typography' },
-    { class: 'font-medium', description: 'Font weight 500', category: 'typography' },
-    { class: 'font-semibold', description: 'Font weight 600', category: 'typography' },
-    { class: 'font-bold', description: 'Font weight 700', category: 'typography' },
-    { class: 'font-extrabold', description: 'Font weight 800', category: 'typography' },
-    { class: 'font-black', description: 'Font weight 900', category: 'typography' }
-  ];
 
   // Create element highlighter
   function createHighlighter() {
@@ -251,7 +130,7 @@
             </div>
           </div>
           <div style="padding: 16px;">
-            <div id="alternatives-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; max-height: 400px; overflow-y: auto;"></div>
+            <div id="alternatives-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; max-height: 500px; overflow-y: auto; padding: 4px;"></div>
           </div>
         </div>
       </div>
@@ -261,40 +140,21 @@
     return panelElement;
   }
 
-  // Load Tailwind classes
-  function loadTailwindClasses() {
-    // Try to load from JSON file first
-    fetch(chrome.runtime.getURL('tailwind-classes-enhanced.json'))
-      .then(response => response.json())
-      .then(data => {
-        console.log('Loading Tailwind classes from JSON...');
-        tailwindClasses = [];
-        
-        // Flatten the trie-based class structure
-        function flattenClasses(obj, prefix = '') {
-          for (const [key, value] of Object.entries(obj)) {
-            if (key === '__info') {
-              if (value.type === 'utility' || !value.type) {
-                tailwindClasses.push({
-                  class: prefix,
-                  description: value.description,
-                  category: value.category
-                });
-              }
-            } else if (typeof value === 'object') {
-              const newPrefix = prefix ? `${prefix}-${key}` : key;
-              flattenClasses(value, newPrefix);
-            }
-          }
-        }
-
-        flattenClasses(data.classNamesTree);
-        console.log(`Loaded ${tailwindClasses.length} Tailwind classes`);
-      })
-      .catch(err => {
-        console.log('Using fallback classes:', err);
-        tailwindClasses = fallbackClasses;
-      });
+  // Initialize Tailwind Intelligence
+  function initializeTailwindIntelligence() {
+    // Load the intelligence system
+    const script = document.createElement('script');
+    script.src = chrome.runtime.getURL('tailwind-intelligence.js');
+    script.onload = () => {
+      tailwindIntelligence = new window.TailwindIntelligence();
+      console.log('Tailwind Intelligence system loaded successfully');
+    };
+    script.onerror = () => {
+      console.error('Failed to load Tailwind Intelligence system');
+      // Fallback to basic functionality
+      tailwindIntelligence = null;
+    };
+    document.head.appendChild(script);
   }
 
   // Search functionality
@@ -329,52 +189,51 @@
   }
 
   function performSearch(query, searchSuggestions) {
-    const queryLower = query.toLowerCase();
-    const results = [];
+    if (!tailwindIntelligence) {
+      searchSuggestions.innerHTML = `
+        <div style="padding: 12px; color: #6B7280; text-align: center; font-size: 14px;">
+          Intelligence system loading...
+        </div>
+      `;
+      searchSuggestions.style.display = 'block';
+      return;
+    }
 
-    // Search through classes
-    tailwindClasses.forEach(cls => {
-      let score = 0;
-      
-      if (cls.class.toLowerCase() === queryLower) score = 100;
-      else if (cls.class.toLowerCase().startsWith(queryLower)) score = 90;
-      else if (cls.class.toLowerCase().includes(queryLower)) score = 70;
-      else if (cls.description.toLowerCase().includes(queryLower)) score = 50;
-      else if (cls.category.toLowerCase().includes(queryLower)) score = 30;
+    const results = tailwindIntelligence.search(query, 12);
 
-      if (score > 0) {
-        results.push({ ...cls, score });
-      }
-    });
-
-    // Sort by score and limit results
-    results.sort((a, b) => b.score - a.score);
-    const topResults = results.slice(0, 10);
-
-    if (topResults.length > 0) {
-      searchSuggestions.innerHTML = topResults.map(cls => {
-        const highlightedClass = cls.class.replace(
+    if (results.length > 0) {
+      searchSuggestions.innerHTML = results.map(cls => {
+        const highlightedClass = cls.name.replace(
           new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
           match => `<span style="font-weight: 600; color: #3B82F6;">${match}</span>`
         );
         
+        const categoryColor = getCategoryColor(cls.category);
+        
         return `
-          <div class="search-suggestion" data-class="${cls.class}" style="padding: 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: all 0.1s ease; background: white;">
-            <div style="font-weight: 500; margin-bottom: 4px; font-family: monospace; font-size: 13px;">${highlightedClass}</div>
-            <div style="font-size: 12px; color: #6B7280;">${cls.description} • ${cls.category}</div>
+          <div class="search-suggestion" data-class="${cls.name}" style="padding: 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: all 0.1s ease; background: white; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+              <div style="font-weight: 500; font-family: monospace; font-size: 13px; color: #111827;">${highlightedClass}</div>
+              <div style="background: ${categoryColor}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">${cls.category}</div>
+            </div>
+            <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;">${cls.description}</div>
+            ${cls.css ? `<div style="font-size: 11px; color: #9CA3AF; font-family: monospace; background: #f8fafc; padding: 2px 4px; border-radius: 2px;">${cls.css}</div>` : ''}
+            ${cls.variants && cls.variants.length > 0 ? `<div style="font-size: 10px; color: #3B82F6; margin-top: 4px;">Variants: ${cls.variants.slice(0, 3).join(', ')}${cls.variants.length > 3 ? '...' : ''}</div>` : ''}
           </div>
         `;
       }).join('');
 
-      // Add hover effects
+      // Add hover effects and click handlers
       const suggestionElements = searchSuggestions.querySelectorAll('.search-suggestion');
       suggestionElements.forEach(suggestion => {
         suggestion.addEventListener('mouseenter', function() {
           this.style.backgroundColor = '#f8fafc';
+          this.style.borderLeft = '3px solid #3B82F6';
         });
         
         suggestion.addEventListener('mouseleave', function() {
           this.style.backgroundColor = 'white';
+          this.style.borderLeft = 'none';
         });
 
         suggestion.addEventListener('click', function() {
@@ -389,11 +248,25 @@
     } else {
       searchSuggestions.innerHTML = `
         <div style="padding: 12px; color: #6B7280; text-align: center; font-size: 14px;">
-          No classes found for "${query}"
+          <div style="margin-bottom: 8px;">No classes found for "${query}"</div>
+          <div style="font-size: 12px; color: #9CA3AF;">Try searching for: p-, m-, bg-, text-, flex, grid</div>
         </div>
       `;
       searchSuggestions.style.display = 'block';
     }
+  }
+
+  function getCategoryColor(category) {
+    const colors = {
+      spacing: '#10B981',
+      colors: '#F59E0B',
+      layout: '#3B82F6',
+      typography: '#8B5CF6',
+      borders: '#EF4444',
+      effects: '#06B6D4',
+      utility: '#6B7280'
+    };
+    return colors[category] || colors.utility;
   }
 
   // Initialize extension
@@ -407,8 +280,8 @@
     highlighter = createHighlighter();
     panel = createFloatingPanel();
 
-    // Load classes
-    loadTailwindClasses();
+    // Initialize Tailwind Intelligence
+    initializeTailwindIntelligence();
 
     // Set up functionality
     setupEventListeners();
@@ -692,7 +565,7 @@
     });
   }
 
-  // Open class alternatives modal
+  // Open class alternatives modal with enhanced intelligence
   function openClassAlternativesModal(className) {
     const modal = document.getElementById('class-alternatives-modal');
     const modalClassName = document.getElementById('modal-class-name');
@@ -700,100 +573,98 @@
     
     modalClassName.textContent = className;
     
-    // Generate alternatives
-    const alternatives = generateClassAlternatives(className);
+    if (!tailwindIntelligence) {
+      alternativesGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #6B7280;">
+          Intelligence system loading...
+        </div>
+      `;
+      modal.style.display = 'flex';
+      return;
+    }
+
+    // Get detailed alternatives with descriptions
+    const alternatives = tailwindIntelligence.getAlternatives(className, 18);
     
-    alternativesGrid.innerHTML = alternatives.map(alt => `
-      <div class="alternative-item" data-class="${alt}" style="
-        padding: 8px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        font-family: monospace;
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-align: center;
-      ">${alt}</div>
-    `).join('');
+    if (alternatives.length === 0) {
+      alternativesGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #6B7280;">
+          <div style="margin-bottom: 8px;">No alternatives found for "${className}"</div>
+          <div style="font-size: 12px; color: #9CA3AF;">This class might be custom or very specific.</div>
+        </div>
+      `;
+    } else {
+      alternativesGrid.innerHTML = alternatives.map(alt => {
+        const categoryColor = getCategoryColor(alt.category);
+        return `
+          <div class="alternative-item" data-class="${alt.name}" style="
+            padding: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          ">
+            <div>
+              <div style="font-family: monospace; font-size: 12px; font-weight: 600; color: #111827; margin-bottom: 4px; word-break: break-all;">${alt.name}</div>
+              <div style="font-size: 10px; color: #6B7280; line-height: 1.3; margin-bottom: 6px;">${alt.description}</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="background: ${categoryColor}; color: white; padding: 1px 4px; border-radius: 2px; font-size: 8px; font-weight: 500; text-transform: uppercase;">${alt.category}</div>
+              <div style="font-size: 8px; color: #3B82F6; font-weight: 500;">Click to apply</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
     
-    // Add click handlers for alternatives
+    // Add enhanced click handlers for alternatives
     alternativesGrid.querySelectorAll('.alternative-item').forEach(item => {
       item.addEventListener('mouseenter', function() {
         this.style.backgroundColor = '#e0f2fe';
         this.style.borderColor = '#3B82F6';
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.15)';
       });
       
       item.addEventListener('mouseleave', function() {
         this.style.backgroundColor = '#f8fafc';
         this.style.borderColor = '#e2e8f0';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
       });
       
       item.addEventListener('click', function() {
         const newClass = this.dataset.class;
-        replaceClass(className, newClass);
-        modal.style.display = 'none';
+        
+        // Add visual feedback
+        this.style.backgroundColor = '#10B981';
+        this.style.borderColor = '#10B981';
+        this.style.color = 'white';
+        
+        setTimeout(() => {
+          replaceClass(className, newClass);
+          modal.style.display = 'none';
+        }, 200);
       });
     });
     
     modal.style.display = 'flex';
   }
 
-  // Generate class alternatives
+  // Generate class alternatives using Tailwind Intelligence
   function generateClassAlternatives(className) {
-    const alternatives = [];
-    
-    // Parse class to understand its type
-    if (className.startsWith('p-')) {
-      // Padding alternatives
-      const value = className.split('-')[1];
-      const baseValues = ['0', '1', '2', '3', '4', '5', '6', '8', '10', '12', '16', '20', '24'];
-      baseValues.forEach(val => {
-        if (val !== value) {
-          alternatives.push(`p-${val}`);
-        }
-      });
-    } else if (className.startsWith('m-')) {
-      // Margin alternatives
-      const value = className.split('-')[1];
-      const baseValues = ['0', '1', '2', '3', '4', '5', '6', '8', '10', '12', '16', '20', '24'];
-      baseValues.forEach(val => {
-        if (val !== value) {
-          alternatives.push(`m-${val}`);
-        }
-      });
-    } else if (className.startsWith('bg-')) {
-      // Background color alternatives
-      const parts = className.split('-');
-      if (parts.length >= 3) {
-        const color = parts[1];
-        const shades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
-        shades.forEach(shade => {
-          alternatives.push(`bg-${color}-${shade}`);
-        });
-      }
-      // Different colors
-      const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'gray'];
-      colors.forEach(color => {
-        alternatives.push(`bg-${color}-500`);
-      });
-    } else if (className.startsWith('text-')) {
-      // Text color alternatives
-      const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'gray', 'black', 'white'];
-      colors.forEach(color => {
-        alternatives.push(`text-${color}-500`);
-      });
-    } else if (className.startsWith('rounded')) {
-      // Border radius alternatives
-      const sizes = ['rounded-none', 'rounded-sm', 'rounded', 'rounded-md', 'rounded-lg', 'rounded-xl', 'rounded-2xl', 'rounded-full'];
-      alternatives.push(...sizes.filter(s => s !== className));
-    } else if (className.startsWith('shadow')) {
-      // Shadow alternatives
-      const sizes = ['shadow-none', 'shadow-sm', 'shadow', 'shadow-md', 'shadow-lg', 'shadow-xl', 'shadow-2xl'];
-      alternatives.push(...sizes.filter(s => s !== className));
+    if (!tailwindIntelligence) {
+      return []; // Return empty if intelligence system not loaded
     }
-    
-    return alternatives.slice(0, 12); // Limit to 12 alternatives
+
+    const alternatives = tailwindIntelligence.getAlternatives(className, 15);
+    return alternatives.map(alt => alt.name);
   }
 
   // Replace a class with another
@@ -828,46 +699,70 @@
     generateSuggestions(classes);
   }
 
-  // Generate class suggestions
+  // Generate intelligent class suggestions
   function generateSuggestions(classes) {
-    const suggestions = [
-      'p-4', 'p-6', 'm-4', 'bg-blue-500', 'text-white', 'rounded-lg', 'shadow-md', 'font-semibold', 'flex', 'hidden'
-    ];
-    
-    // Filter out already applied classes
-    const filteredSuggestions = suggestions.filter(suggestion => !classes.includes(suggestion));
+    if (!tailwindIntelligence) {
+      document.getElementById('suggestions').style.display = 'none';
+      return;
+    }
+
+    // Get contextual suggestions based on existing classes
+    const suggestions = tailwindIntelligence.getContextualSuggestions(classes, 8);
     
     // Display suggestions
     const suggestionsList = document.getElementById('suggestions-list');
     suggestionsList.innerHTML = '';
     
-    filteredSuggestions.slice(0, 6).forEach(suggestion => {
+    if (suggestions.length === 0) {
+      document.getElementById('suggestions').style.display = 'none';
+      return;
+    }
+    
+    suggestions.forEach(suggestion => {
       const suggestionItem = document.createElement('div');
       suggestionItem.style.cssText = `
-        padding: 8px 12px;
-        margin-bottom: 4px;
-        background-color: #f3f4f6;
-        border-radius: 6px;
-        font-family: monospace;
-        font-size: 13px;
+        padding: 10px 12px;
+        margin-bottom: 6px;
+        background-color: #f8fafc;
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.2s;
-        border: 1px solid #e5e7eb;
+        border: 1px solid #e2e8f0;
+        position: relative;
       `;
-      suggestionItem.textContent = suggestion;
+      
+      const categoryColor = getCategoryColor(suggestion.category);
+      
+      suggestionItem.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+          <div style="font-family: monospace; font-size: 13px; font-weight: 600; color: #111827;">${suggestion.name}</div>
+          <div style="background: ${categoryColor}; color: white; padding: 1px 4px; border-radius: 2px; font-size: 9px; font-weight: 500; text-transform: uppercase;">${suggestion.category}</div>
+        </div>
+        <div style="font-size: 11px; color: #6B7280; line-height: 1.3;">${suggestion.description}</div>
+        ${suggestion.css ? `<div style="font-size: 10px; color: #9CA3AF; font-family: monospace; margin-top: 4px; background: #f1f5f9; padding: 2px 4px; border-radius: 2px;">${suggestion.css}</div>` : ''}
+      `;
       
       suggestionItem.addEventListener('mouseenter', function() {
         this.style.backgroundColor = '#e0f2fe';
         this.style.borderColor = '#3B82F6';
+        this.style.transform = 'translateX(4px)';
       });
       
       suggestionItem.addEventListener('mouseleave', function() {
-        this.style.backgroundColor = '#f3f4f6';
-        this.style.borderColor = '#e5e7eb';
+        this.style.backgroundColor = '#f8fafc';
+        this.style.borderColor = '#e2e8f0';
+        this.style.transform = 'translateX(0)';
       });
       
       suggestionItem.addEventListener('click', () => {
-        addClass(suggestion);
+        // Add visual feedback
+        suggestionItem.style.backgroundColor = '#10B981';
+        suggestionItem.style.borderColor = '#10B981';
+        suggestionItem.style.color = 'white';
+        
+        setTimeout(() => {
+          addClass(suggestion.name);
+        }, 150);
       });
       
       suggestionsList.appendChild(suggestionItem);

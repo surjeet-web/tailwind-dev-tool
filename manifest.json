@@ -43,7 +43,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["content.js", "content.css", "tailwind-classes.json", "tailwind-classes-enhanced.json"],
+      "resources": ["content.js", "content.css", "tailwind-classes.json", "tailwind-classes-enhanced.json", "tailwind-intelligence.js"],
       "matches": ["<all_urls>"]
     }
   ]

@@ -1,0 +1,174 @@
+/* Content script styles for Tailwind CSS Developer Tools extension */
+
+/* Element highlighter for inspector */
+.element-highlighter {
+  position: absolute;
+  pointer-events: none;
+  border: 2px solid #3B82F6;
+  background-color: rgba(59, 130, 246, 0.1);
+  z-index: 99999;
+  transition: all 0.1s ease;
+  box-sizing: border-box;
+}
+
+.element-highlighter::before {
+  content: attr(data-element-tag);
+  position: absolute;
+  top: -24px;
+  left: 0;
+  background: #3B82F6;
+  color: white;
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: 2px;
+  font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+}
+
+/* Floating panel styles */
+#tailwind-tools-panel {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #111827;
+}
+
+#tailwind-tools-panel button {
+  transition: all 0.2s ease;
+}
+
+#tailwind-tools-panel button:hover {
+  transform: translateY(-1px);
+}
+
+#tailwind-tools-panel .tab-button:hover {
+  background-color: #f3f4f6;
+}
+
+#tailwind-tools-panel .design-tool-button:hover,
+#tailwind-tools-panel .color-swatch:hover,
+#tailwind-tools-panel .apply-as-button:hover,
+#tailwind-tools-panel .animation-button:hover,
+#tailwind-tools-panel .breakpoint-button:hover {
+  background-color: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+#tailwind-tools-panel .design-tool-button.active {
+  border-color: #3B82F6;
+  background-color: #EFF6FF;
+}
+
+/* Custom scrollbar for the extension panel */
+#tailwind-tools-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+#tailwind-tools-panel::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+#tailwind-tools-panel::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+#tailwind-tools-panel::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animation classes for GSAP */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.panel-enter {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.panel-exit {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Focus styles for accessibility */
+#tailwind-tools-panel button:focus,
+#tailwind-tools-panel input:focus,
+#tailwind-tools-panel select:focus {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Color palette for the extension */
+:root {
+  --primary-color: #3B82F6;
+  --primary-hover: #2563EB;
+  --secondary-color: #6B7280;
+  --secondary-hover: #4B5563;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --error-color: #EF4444;
+  --background-color: #FFFFFF;
+  --surface-color: #F9FAFB;
+  --border-color: #E5E7EB;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #1F2937;
+    --surface-color: #111827;
+    --border-color: #374151;
+    --text-primary: #F9FAFB;
+    --text-secondary: #D1D5DB;
+    --text-tertiary: #9CA3AF;
+  }
+  
+  #tailwind-tools-panel {
+    background-color: #1F2937;
+    color: #F9FAFB;
+  }
+  
+  #tailwind-tools-panel .tab-button:hover {
+    background-color: #374151;
+  }
+  
+  #tailwind-tools-panel .design-tool-button:hover,
+  #tailwind-tools-panel .color-swatch:hover,
+  #tailwind-tools-panel .apply-as-button:hover,
+  #tailwind-tools-panel .animation-button:hover,
+  #tailwind-tools-panel .breakpoint-button:hover {
+    background-color: #374151;
+  }
+  
+  #tailwind-tools-panel .design-tool-button.active {
+    border-color: #3B82F6;
+    background-color: #1E3A8A;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  #tailwind-tools-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}

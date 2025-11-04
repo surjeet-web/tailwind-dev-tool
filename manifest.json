@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "Tailwind CSS Developer Tools",
+  "version": "1.0.0",
+  "description": "A comprehensive browser extension for Tailwind CSS development with visual design tools, responsive preview, and accessibility checking.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "commands": {
+    "toggle-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+T",
+        "mac": "Command+Shift+T"
+      },
+      "description": "Toggle extension panel"
+    },
+    "inspect-element": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+I",
+        "mac": "Command+Shift+I"
+      },
+      "description": "Inspect element"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["content.js", "content.css", "tailwind-classes.json", "tailwind-classes-enhanced.json", "tailwind-intelligence.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

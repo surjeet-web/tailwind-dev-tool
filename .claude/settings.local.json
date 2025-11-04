@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start test-panel.html)",
+      "Bash(node -e:*)",
+      "WebFetch(domain:unpkg.com)",
+      "Bash(node -c:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git clone:*)",
+      "Bash(start test-enhanced-functionality.html:*)",
+      "Bash(start test-interactive-features.html:*)",
+      "Bash(start test-complete-functionality.html)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

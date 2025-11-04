@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind Dev Tools Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .demo-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .demo-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .demo-element {
+            padding: 20px;
+            margin: 10px 0;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: monospace;
+        }
+        .demo-element:hover {
+            background: #f1f5f9;
+            border-color: #3B82F6;
+        }
+        .demo-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 420px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+            z-index: 99999;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+            overflow: hidden;
+            font-family: Inter, system-ui, sans-serif;
+        }
+        .demo-panel.open {
+            transform: translateX(0);
+        }
+        .demo-header {
+            padding: 16px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .demo-content-area {
+            padding: 16px;
+            height: calc(100% - 65px);
+            overflow-y: auto;
+        }
+        .demo-classes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0;
+        }
+        .demo-class-item {
+            padding: 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .demo-class-item:hover {
+            background: #e5e7eb;
+        }
+        .demo-search {
+            display: flex;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #d1d5db;
+            margin: 10px 0;
+        }
+        .demo-search input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+        .demo-search button {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border: none;
+            cursor: pointer;
+        }
+        .demo-suggestions {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .demo-suggestion {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .demo-suggestion:hover {
+            background: #f8fafc;
+        }
+        .demo-suggestion:last-child {
+            border-bottom: none;
+        }
+        .demo-key {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            font-size: 12px;
+            margin: 0 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-content">
+        <h1>🎯 Tailwind Dev Tools - Demo</h1>
+
+        <div class="demo-section">
+            <h2>📋 Demo Instructions</h2>
+            <p>This demo shows how the Tailwind Dev Tools extension should work:</p>
+            <ol>
+                <li>Click on any element below to simulate selecting it in the extension</li>
+                <li>Click the "Toggle Panel" button or press 'M' to open the demo panel</li>
+                <li>See how applied classes are displayed with clickable alternatives</li>
+                <li>Try the search functionality to see instant suggestions</li>
+                <li>Notice the visual indicators that guide you to interactive features</li>
+            </ol>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 Sample Elements</h2>
+            <p>Click these elements to see how the extension would analyze them:</p>
+
+            <div class="demo-element" onclick="selectDemoElement(this, 'p-4 bg-blue-500 text-white rounded-lg')">
+                <strong>Button 1:</strong> p-4 bg-blue-500 text-white rounded-lg
+            </div>
+
+            <div class="demo-element" onclick="selectDemoElement(this, 'm-6 bg-red-500 text-white shadow-md')">
+                <strong>Button 2:</strong> m-6 bg-red-500 text-white shadow-md
+            </div>
+
+            <div class="demo-element" onclick="selectDemoElement(this, 'p-3 bg-green-600 text-white flex items-center gap-2')">
+                <strong>Button 3:</strong> p-3 bg-green-600 text-white flex items-center gap-2
+            </div>
+
+            <div class="demo-element" onclick="selectDemoElement(this, 'pt-6 pr-4 pb-6 pl-4 bg-yellow-500 text-black font-semibold rounded-md')">
+                <strong>Button 4:</strong> pt-6 pr-4 pb-6 pl-4 bg-yellow-500 text-black font-semibold rounded-md
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <button onclick="toggleDemoPanel()" style="background: #3B82F6; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                Toggle Demo Panel
+            </button>
+            <span style="margin-left: 10px;">(or press <span class="demo-key">M</span> key)</span>
+        </div>
+    </div>
+
+    <!-- Demo Panel -->
+    <div class="demo-panel" id="demo-panel">
+        <div class="demo-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="margin: 0; font-size: 16px; font-weight: bold; color: #111827;">Tailwind CSS Tools</h1>
+                    <div style="font-size: 11px; color: #6B7280; margin-top: 2px;">Demo v2.0</div>
+                </div>
+                <button onclick="toggleDemoPanel()" style="background: none; border: none; cursor: pointer; padding: 6px;">
+                    <svg width="16" height="16" fill="#6B7280" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="demo-content-area">
+            <div id="demo-applied-classes" style="display: none;">
+                <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 8px;">
+                    <h3 style="font-size: 14px; font-weight: 600; color: #111827; margin: 0;">Applied Classes</h3>
+                    <span style="font-size: 11px; color: #3B82F6; background: #EFF6FF; padding: 2px 6px; border-radius: 3px; font-weight: 500;">💡 Click any class to explore alternatives</span>
+                </div>
+                <div id="demo-classes-list" class="demo-classes"></div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #111827;">Add Class</h3>
+                <div class="demo-search">
+                    <input type="text" id="demo-class-search" placeholder="Search 500+ Tailwind classes..." oninput="searchDemoClasses(this.value)">
+                    <button>
+                        <svg width="16" height="16" fill="#6B7280" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="demo-search-suggestions" class="demo-suggestions" style="display: none;"></div>
+            </div>
+
+            <div id="demo-suggestions" style="display: none;">
+                <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #111827;">Smart Suggestions</h3>
+                <div id="demo-suggestions-list" class="demo-classes"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let demoPanelOpen = false;
+        let selectedElementClasses = [];
+
+        function toggleDemoPanel() {
+            const panel = document.getElementById('demo-panel');
+            demoPanelOpen = !demoPanelOpen;
+
+            if (demoPanelOpen) {
+                panel.classList.add('open');
+            } else {
+                panel.classList.remove('open');
+            }
+        }
+
+        function selectDemoElement(element, classes) {
+            selectedElementClasses = classes.split(' ');
+
+            // Show applied classes section
+            document.getElementById('demo-applied-classes').style.display = 'block';
+
+            // Display classes
+            const classesList = document.getElementById('demo-classes-list');
+            classesList.innerHTML = '';
+
+            selectedElementClasses.forEach(cls => {
+                const classItem = document.createElement('div');
+                classItem.className = 'demo-class-item';
+                classItem.textContent = cls;
+                classItem.onclick = () => showClassAlternatives(cls);
+                classesList.appendChild(classItem);
+            });
+
+            // Show suggestions
+            showDemoSuggestions();
+        }
+
+        function showClassAlternatives(className) {
+            alert(`Class Alternatives for "${className}":
+
+This would normally open a modal with alternative suggestions like:
+- hover:${className}
+- sm:${className}
+- md:${className}
+- Similar spacing/color/border alternatives
+- Context-aware recommendations
+
+The extension would show 5-10 relevant alternatives that you can preview before applying.`);
+        }
+
+        function searchDemoClasses(query) {
+            const suggestions = document.getElementById('demo-search-suggestions');
+
+            if (query.trim() === '') {
+                suggestions.style.display = 'none';
+                return;
+            }
+
+            // Show suggestions container
+            suggestions.style.display = 'block';
+
+            // Clear previous suggestions
+            suggestions.innerHTML = '';
+
+            // Demo search results (in real extension, this would use the enhanced search algorithm)
+            const searchResults = [
+                { class: 'p-4', description: 'Padding 1rem (16px)', category: 'spacing' },
+                { class: 'p-6', description: 'Padding 1.5rem (24px)', category: 'spacing' },
+                { class: 'bg-blue-500', description: 'Blue 500 background', category: 'colors' },
+                { class: 'text-white', description: 'White text color', category: 'colors' },
+                { class: 'rounded-lg', description: 'Border radius 0.5rem', category: 'borders' },
+                { class: 'shadow-md', description: 'Medium shadow', category: 'effects' }
+            ].filter(item =>
+                item.class.toLowerCase().includes(query.toLowerCase()) ||
+                item.description.toLowerCase().includes(query.toLowerCase()) ||
+                item.category.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (searchResults.length > 0) {
+                searchResults.slice(0, 8).forEach(result => {
+                    const suggestion = document.createElement('div');
+                    suggestion.className = 'demo-suggestion';
+                    suggestion.innerHTML = `
+                        <div style="font-weight: 500; margin-bottom: 4px; font-family: monospace;">${result.class}</div>
+                        <div style="font-size: 12px; color: #6B7280;">${result.description} • ${result.category}</div>
+                    `;
+                    suggestion.onclick = () => addClassToElement(result.class);
+                    suggestions.appendChild(suggestion);
+                });
+            } else {
+                suggestions.innerHTML = '<div style="padding: 12px; color: #6B7280; text-align: center; font-size: 14px;">No classes found. Try a different search term.</div>';
+            }
+        }
+
+        function addClassToElement(className) {
+            if (!selectedElementClasses.includes(className)) {
+                selectedElementClasses.push(className);
+                selectDemoElement(null, selectedElementClasses.join(' '));
+
+                // Clear search
+                document.getElementById('demo-class-search').value = '';
+                document.getElementById('demo-search-suggestions').style.display = 'none';
+
+                alert(`Added class: ${className}`);
+            }
+        }
+
+        function showDemoSuggestions() {
+            document.getElementById('demo-suggestions').style.display = 'block';
+
+            const suggestionsList = document.getElementById('demo-suggestions-list');
+            suggestionsList.innerHTML = '';
+
+            const suggestions = ['p-2', 'p-3', 'm-2', 'bg-red-500', 'rounded-md', 'shadow-sm'];
+
+            suggestions.forEach(suggestion => {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.className = 'demo-class-item';
+                suggestionItem.textContent = suggestion;
+                suggestionItem.onclick = () => addClassToElement(suggestion);
+                suggestionsList.appendChild(suggestionItem);
+            });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'm' || e.key === 'M') {
+                e.preventDefault();
+                toggleDemoPanel();
+            } else if (e.key === 'Escape') {
+                if (demoPanelOpen) {
+                    toggleDemoPanel();
+                }
+            }
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            const searchInput = document.getElementById('demo-class-search');
+            const suggestions = document.getElementById('demo-search-suggestions');
+
+            if (searchInput && suggestions && !searchInput.contains(e.target) && !suggestions.contains(e.target)) {
+                suggestions.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

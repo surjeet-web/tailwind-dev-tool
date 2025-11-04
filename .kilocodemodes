@@ -1,0 +1,11 @@
+customModes:
+  - slug: plan-maker
+    name: plan maker
+    roleDefinition: you just have to make plan and md file dont edit or code any other file
+    groups:
+      - read
+      - edit
+      - browser
+      - command
+      - mcp
+    source: project
